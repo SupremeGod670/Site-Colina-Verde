@@ -1,7 +1,22 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const pool = require('./db');
+const multer = require('multer');
+const path = require('path');
 const router = express.Router();
+
+// Configuração do multer para salvar arquivos em /uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, 'uploads'));
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const name = file.fieldname + '-' + Date.now() + ext;
+    cb(null, name);
+  }
+});
+const upload = multer({ storage });
 
 // Cadastro de administrador
 router.post('/register', async (req, res) => {
@@ -44,9 +59,11 @@ router.get('/buffet', async (req, res) => {
   res.json(result.rows);
 });
 
-router.put('/buffet/:id', async (req, res) => {
-  const { preco_por_kg, url_imagem } = req.body;
-  await pool.query("UPDATE buffet SET preco_por_kg = $1, url_imagem = $2 WHERE id_buffet = $3", [preco_por_kg, url_imagem, req.params.id]);
+// Atualiza buffet com upload de imagem/video
+router.put('/buffet/:id', upload.single('media'), async (req, res) => {
+  const { preco_por_kg } = req.body;
+  let url_media = req.file ? `/uploads/${req.file.filename}` : req.body.url_imagem;
+  await pool.query("UPDATE buffet SET preco_por_kg = $1, url_imagem = $2 WHERE id_buffet = $3", [preco_por_kg, url_media, req.params.id]);
   res.sendStatus(200);
 });
 
@@ -55,12 +72,13 @@ router.get('/porcoes', async (req, res) => {
   res.json(result.rows);
 });
 
-router.post('/porcoes', async (req, res) => {
-  let { nome_porcao, descricao, preco_inteira, preco_meia, url_imagem } = req.body;
-  // Se os campos vierem vazios, salva como null
+// Adiciona porção com upload de imagem/video
+router.post('/porcoes', upload.single('media'), async (req, res) => {
+  let { nome_porcao, descricao, preco_inteira, preco_meia } = req.body;
   preco_inteira = preco_inteira === '' || preco_inteira === undefined ? null : preco_inteira;
   preco_meia = preco_meia === '' || preco_meia === undefined ? null : preco_meia;
-  await pool.query("INSERT INTO porcoes (nome_porcao, descricao, preco_inteira, preco_meia, url_imagem) VALUES ($1, $2, $3, $4, $5)", [nome_porcao, descricao, preco_inteira, preco_meia, url_imagem]);
+  let url_media = req.file ? `/uploads/${req.file.filename}` : null;
+  await pool.query("INSERT INTO porcoes (nome_porcao, descricao, preco_inteira, preco_meia, url_imagem) VALUES ($1, $2, $3, $4, $5)", [nome_porcao, descricao, preco_inteira, preco_meia, url_media]);
   res.sendStatus(201);
 });
 
@@ -80,9 +98,11 @@ router.get('/drinks', async (req, res) => {
   res.json(result.rows);
 });
 
-router.post('/drinks', async (req, res) => {
-  const { nome_drink, descricao, preco, tamanho, url_imagem } = req.body;
-  await pool.query("INSERT INTO drinks (nome_drink, descricao, preco, tamanho, url_imagem) VALUES ($1, $2, $3, $4, $5)", [nome_drink, descricao, preco, tamanho, url_imagem]);
+// Adiciona drink com upload de imagem/video
+router.post('/drinks', upload.single('media'), async (req, res) => {
+  const { nome_drink, descricao, preco, tamanho } = req.body;
+  let url_media = req.file ? `/uploads/${req.file.filename}` : null;
+  await pool.query("INSERT INTO drinks (nome_drink, descricao, preco, tamanho, url_imagem) VALUES ($1, $2, $3, $4, $5)", [nome_drink, descricao, preco, tamanho, url_media]);
   res.sendStatus(201);
 });
 
