@@ -1,9 +1,13 @@
-function login() {
+async function login() {
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
-    const hash = btoa(pass); // Simples simulação de hash (não seguro para produção)
-
-    if (user === "admin" && hash === btoa("admin123")) {
+    const res = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, senha: pass })
+    });
+    const data = await res.json();
+    if (data.success) {
         document.getElementById("loginContainer").style.display = "none";
         document.getElementById("adminContainer").style.display = "block";
         showTab('buffet');
