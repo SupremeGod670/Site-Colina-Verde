@@ -1,3 +1,31 @@
+// Função para expandir imagem em modal
+function expandImage(src, alt) {
+  let modal = document.getElementById('img-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'img-modal';
+    modal.setAttribute('tabindex', '0');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'rgba(0,0,0,0.8)';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = '9999';
+    modal.innerHTML = `<img src="${src}" alt="${alt}" style="max-width:90vw;max-height:80vh;border-radius:16px;box-shadow:0 4px 24px #0008;" /><button id="close-modal" aria-label="Fechar imagem" style="position:absolute;top:32px;right:32px;font-size:2rem;background:#fff;border:none;border-radius:50%;padding:8px;cursor:pointer;">&times;</button>`;
+    document.body.appendChild(modal);
+    document.getElementById('close-modal').onclick = () => {
+      modal.remove();
+    };
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.remove();
+    };
+    modal.focus();
+  }
+}
 // Buffet
 const buffetItens = [
   { nome: "Arroz", img: "../Img/Buffet.png" },
@@ -11,7 +39,7 @@ if (buffetCarousel) {
     .map(
       (item) => `
       <figure>
-        <img src="${item.img}" alt="${item.nome}" />
+        <img src="${item.img}" alt="${item.nome}" style="width:100%;height:200px;object-fit:cover;border-radius:12px 12px 0 0;cursor:pointer;" onclick="expandImage('${item.img}','${item.nome}')" tabindex="0" aria-label="Expandir imagem de ${item.nome}">
         <figcaption>${item.nome}</figcaption>
       </figure>
     `
@@ -137,7 +165,7 @@ function createCardapio() {
         let preco = item.meia ? `${item.inteira} / ${item.meia}` : item.inteira;
         return `<li class="menu-item">
           <figure style="width:80px; margin:0 10px 0 0; display:inline-block; vertical-align:middle;">
-            <img src="${item.img}" alt="${item.nome}" style="width:100%;border-radius:8px;">
+            <img src="${item.img}" alt="${item.nome}" style="width:100%;border-radius:8px;cursor:pointer;" onclick="expandImage('${item.img}','${item.nome}')" tabindex="0" aria-label="Expandir imagem de ${item.nome}">
             <figcaption style="font-size:0.85rem;color:#388e3c;">${item.nome}</figcaption>
           </figure>
           <span style="font-weight:bold; color:#388e3c;">${preco}</span>
@@ -158,7 +186,7 @@ function createCardapio() {
         (item) =>
           `<li class="menu-item">
             <figure style="width:80px; margin:0 10px 0 0; display:inline-block; vertical-align:middle;">
-              <img src="${item.img}" alt="${item.nome}" style="width:100%;border-radius:8px;">
+              <img src="${item.img}" alt="${item.nome}" style="width:100%;border-radius:8px;cursor:pointer;" onclick="expandImage('${item.img}','${item.nome}')" tabindex="0" aria-label="Expandir imagem de ${item.nome}">
               <figcaption style="font-size:0.85rem;color:#388e3c;">${item.nome}</figcaption>
             </figure>
             <span style="font-weight:bold; color:#388e3c;">${item.preco}</span>
