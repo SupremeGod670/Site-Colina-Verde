@@ -2,17 +2,21 @@
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cardápio - Colina Verde</title>
+    <link rel="icon" href="../Icon/icone_colina_verde.ico">
     <link rel="stylesheet" href="../CSS/cardapio.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 
 <body>
     <header>
         <nav class="container header-content" aria-label="Menu principal">
-            <h1 class="logo">🌿 Colina Verde</h1>
+            <h1 class="logo"><img src="../Img/icone_colina_verde.png" alt="Logo Colina Verde"
+                    style="height:32px;vertical-align:middle;margin-right:8px;">Colina Verde</h1>
             <ul>
-                <li><a href="index.html">Início</a></li>
+                <li><a href="index.html" title="Voltar ao início da página">Início</a></li>
             </ul>
         </nav>
     </header>
@@ -20,14 +24,35 @@
     <main>
         <section class="cardapio">
             <nav class="tab-menu" aria-label="Categorias do cardápio">
-                <button class="tab" onclick="showTab('buffet')" type="button">Buffet</button>
-                <button class="tab" onclick="showTab('porcoes')" type="button">Porções</button>
-                <button class="tab" onclick="showTab('drinks')" type="button">Drinks</button>
+                <button class="tab" onclick="showTab('buffet')" type="button"
+                    aria-label="Ver opções de Buffet">Buffet</button>
+                <button class="tab" onclick="showTab('porcoes')" type="button"
+                    aria-label="Ver opções de Porções">Porções</button>
+                <button class="tab" onclick="showTab('drinks')" type="button"
+                    aria-label="Ver opções de Drinks">Drinks</button>
             </nav>
 
             <section class="tab-content" id="buffet">
                 <h2>🍽️ Buffet</h2>
-                <div id="buffet-items"></div>
+                <section class="carousel" aria-label="Itens do Buffet">
+                    <figure>
+                        <img src="../Img/Buffet.png" alt="Arroz" />
+                        <figcaption>Arroz</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="../Img/Buffet.png" alt="Feijão" />
+                        <figcaption>Feijão</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="../Img/Buffet.png" alt="Salada" />
+                        <figcaption>Salada</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="../Img/Buffet.png" alt="Macarrão" />
+                        <figcaption>Macarrão</figcaption>
+                    </figure>
+                </section>
+                <p class="price" style="margin-top:10px;font-weight:bold;color:#388e3c;">Preço: R$ 35,00</p>
             </section>
 
             <section class="tab-content" id="porcoes" style="display: none;">
@@ -36,12 +61,14 @@
                     <strong>Valores:</strong> <span style="color:#388e3c;">Porção Inteira</span> / <span
                         style="color:#388e3c;">Meia Porção</span>
                 </div>
-                <ul id="porcoes-items" style="padding:0;"></ul>
+                <ul id="porcoes-items" style="padding:0;">
+                </ul>
             </section>
 
             <section class="tab-content" id="drinks" style="display: none;">
                 <h2>🍹 Drinks</h2>
-                <ul id="drinks-items"></ul>
+                <ul id="drinks-items">
+                </ul>
             </section>
         </section>
     </main>
