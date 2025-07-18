@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administração - Colina Verde</title>
+    <link rel="icon" href="/Icon/icone_colina_verde.ico">
+    <link rel="stylesheet" href="../CSS/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <nav class="header-content" aria-label="Menu principal" style="display:flex;align-items:center;justify-content:space-between;max-width:700px;margin:auto;padding:18px 0;">
+            <h1 class="logo" style="color:#3ca241;font-size:2rem;display:flex;align-items:center;gap:10px;margin:0;">
+                <img src="/Img/icone_colina_verde.png" alt="Logo Colina Verde" style="height:45px;vertical-align:middle;margin-right:8px;">Colina Verde ADM
+            </h1>
+            <ul style="list-style:none;display:flex;gap:25px;margin-left:auto;">
+                <li><a href="/Layout/index.html" title="Ir para o site principal" style="text-decoration:none;color:#333;font-weight:700;font-size:1.15rem;transition:color 0.3s;">Site</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="login-container" id="loginContainer" aria-label="Login administrativo">
+            <h2>Login Administrativo</h2>
+            <form onsubmit="event.preventDefault();login();" style="display:flex;flex-direction:column;gap:10px;">
+                <label for="username">Usuário</label>
+                <input type="text" id="username" placeholder="Usuário" autocomplete="username" required>
+                <label for="password">Senha</label>
+                <input type="password" id="password" placeholder="Senha" autocomplete="current-password" required>
+                <button type="submit">Entrar</button>
+            </form>
+            <p id="loginMessage" role="alert"></p>
+        </section>
+
+        <section class="admin-container" id="adminContainer" style="display:none;" aria-label="Painel administrativo">
+            <h2 style="margin-top:0;">Administração - Colina Verde</h2>
+            <nav class="tabs" aria-label="Navegação de abas">
+                <button onclick="showTab('buffet')" type="button" aria-label="Buffet">Buffet</button>
+                <button onclick="showTab('porcoes')" type="button" aria-label="Porções">Porções</button>
+                <button onclick="showTab('drinks')" type="button" aria-label="Drinks">Drinks</button>
+            </nav>
+            <section id="tabContent" aria-live="polite"></section>
+        </section>
+    </main>
+    <footer style="text-align:center;color:#888;font-size:0.95rem;margin-top:40px;">
+        &copy; 2025 Colina Verde ADM
+    </footer>
+    <script src="../JS/script.js"></script>
+</body>
+</html>
