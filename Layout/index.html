@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,58 +11,69 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <header>
-        <div class="header-content">
+        <nav class="header-content">
             <span class="site-title">Colina Verde</span>
             <img src="../Img/icone_colina_verde.png" alt="Logo Colina Verde" class="logo-header">
-        </div>
+        </nav>
     </header>
     <main>
         <section class="carousel-section">
             <button class="carousel-arrow left" id="prevBtn">&#60;</button>
-            <div class="carousel-container">
+            <section class="carousel-container">
                 <img src="../Img/Carrosel.png" alt="Carrossel" class="carousel-img active">
                 <img src="../Img/Buffet.png" alt="Buffet" class="carousel-img">
                 <img src="../Img/Drinks.png" alt="Drinks" class="carousel-img">
                 <img src="../Img/Petiscos.png" alt="Petiscos" class="carousel-img">
-            </div>
+            </section>
             <button class="carousel-arrow right" id="nextBtn">&#62;</button>
         </section>
         <section class="cards-section">
-            <div class="card">
-                <img src="../Img/Buffet.png" alt="Buffet" class="card-img">
-                <span class="card-title">Buffet</span>
-            </div>
-            <div class="card">
-                <img src="../Img/Petiscos.png" alt="Porções" class="card-img">
-                <span class="card-title">Porções</span>
-            </div>
-            <div class="card">
-                <img src="../Img/Drinks.png" alt="Drinks" class="card-img">
-                <span class="card-title">Drinks</span>
-            </div>
+            <article class="card">
+                <figure>
+                    <img src="../Img/Buffet.png" alt="Buffet" class="card-img">
+                    <p class="card-title">Buffet</p>
+                </figure>
+            </article>
+            <article class="card">
+                <figure>
+                    <img src="../Img/Petiscos.png" alt="Porções" class="card-img">
+                    <p class="card-title">Porções</p>
+                </figure>
+            </article>
+            <article class="card">
+                <figure>
+                    <img src="../Img/Drinks.png" alt="Drinks" class="card-img">
+                    <p class="card-title">Drinks</p>
+                </figure>
+            </article>
         </section>
         <section class="info-section">
-            <div class="info-card">
-                <img src="../Img/Carrosel.png" alt="Mapa" class="map-img">
-                <span class="info-title">Endereço</span>
-            </div>
-            <div class="info-card horarios">
-                <span class="info-title">Horários De Funcionamento</span>
+            <aside class="info-card">
+                <figure>
+                    <figcaption class="info-title">Endereço</figcaption>
+                    <img src="../Img/Carrosel.png" alt="Mapa" class="map-img">
+                </figure>
+            </aside>
+            <aside class="info-card horarios">
+                <header class="info-title">Horários De Funcionamento</header>
                 <ul>
                     <li>⏰Qua a Sab: 18h às 23h.</li>
                     <li>⏰Sab e Dom: 11h às 14h.</li>
                 </ul>
-            </div>
+            </aside>
         </section>
     </main>
     <footer>
-        <div class="footer-content">
-            <a href="#" class="social-icon"><img src="../Img/icone_instagram.webp" alt="Instagram"></a>
-            <a href="#" class="social-icon"><img src="../Img/WhatsApp-icone.png" alt="WhatsApp"></a>
-        </div>
+        <nav class="footer-content">
+            <a href="https://www.instagram.com/colinaverde_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                class="social-icon" target="_blank"><img src="../Img/icone_instagram.webp" alt="Instagram"></a>
+            <a href="https://wa.me/5548999265389" class="social-icon" target="_blank"><img src="../Img/WhatsApp-icone.png" alt="WhatsApp"></a>
+        </nav>
     </footer>
     <script src="../JS/index.js"></script>
 </body>
+
 </html>
