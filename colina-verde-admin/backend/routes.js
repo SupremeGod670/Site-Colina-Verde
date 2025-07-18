@@ -56,7 +56,10 @@ router.get('/porcoes', async (req, res) => {
 });
 
 router.post('/porcoes', async (req, res) => {
-  const { nome_porcao, descricao, preco_inteira, preco_meia, url_imagem } = req.body;
+  let { nome_porcao, descricao, preco_inteira, preco_meia, url_imagem } = req.body;
+  // Se os campos vierem vazios, salva como null
+  preco_inteira = preco_inteira === '' || preco_inteira === undefined ? null : preco_inteira;
+  preco_meia = preco_meia === '' || preco_meia === undefined ? null : preco_meia;
   await pool.query("INSERT INTO porcoes (nome_porcao, descricao, preco_inteira, preco_meia, url_imagem) VALUES ($1, $2, $3, $4, $5)", [nome_porcao, descricao, preco_inteira, preco_meia, url_imagem]);
   res.sendStatus(201);
 });

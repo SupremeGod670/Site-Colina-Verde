@@ -33,11 +33,12 @@ function showTab(tab) {
             <h2>Porções</h2>
             <input type="text" placeholder="Nome da porção">
             <textarea placeholder="Descrição"></textarea>
-            <input type="number" placeholder="Preço inteira">
-            <input type="number" placeholder="Preço meia">
+            <input type="number" placeholder="Preço inteira" min="0">
+            <input type="number" placeholder="Preço meia" min="0">
             <input type="text" placeholder="URL da imagem">
             <button>Adicionar/Atualizar Porção</button>
             <button>Deletar Porção</button>
+            <small style="color:#888;">Preços inteira e meia são opcionais.</small>
         `;
     } else if (tab === "drinks") {
         content = `
