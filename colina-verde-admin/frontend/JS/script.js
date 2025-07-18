@@ -27,7 +27,9 @@ function showTab(tab) {
                 <input type="number" name="preco_por_kg" placeholder="R$">
                 <label>Imagem/Video:</label>
                 <input type="file" name="media" accept="image/*,video/*">
-                <button type="submit">Atualizar Buffet</button>
+                <button type="button" id="criarBuffet">Criar Buffet</button>
+                <button type="button" id="atualizarBuffet">Atualizar Buffet</button>
+                <button type="button" id="deletarBuffet">Deletar Buffet</button>
             </form>
             <p id="buffetMsg"></p>
         `;
@@ -41,8 +43,9 @@ function showTab(tab) {
                 <input type="number" name="preco_meia" placeholder="Preço meia" min="0">
                 <label>Imagem/Video:</label>
                 <input type="file" name="media" accept="image/*,video/*">
-                <button type="submit">Adicionar/Atualizar Porção</button>
-                <button type="button">Deletar Porção</button>
+                <button type="button" id="criarPorcao">Criar Porção</button>
+                <button type="button" id="atualizarPorcao">Atualizar Porção</button>
+                <button type="button" id="deletarPorcao">Deletar Porção</button>
                 <small style="color:#888;">Preços inteira e meia são opcionais.</small>
             </form>
             <p id="porcaoMsg"></p>
@@ -57,8 +60,9 @@ function showTab(tab) {
                 <input type="text" name="tamanho" placeholder="Tamanho">
                 <label>Imagem/Video:</label>
                 <input type="file" name="media" accept="image/*,video/*">
-                <button type="submit">Adicionar/Atualizar Drink</button>
-                <button type="button">Deletar Drink</button>
+                <button type="button" id="criarDrink">Criar Drink</button>
+                <button type="button" id="atualizarDrink">Atualizar Drink</button>
+                <button type="button" id="deletarDrink">Deletar Drink</button>
             </form>
             <p id="drinkMsg"></p>
         `;
@@ -66,41 +70,93 @@ function showTab(tab) {
 
     document.getElementById("tabContent").innerHTML = content;
 
-    // Adiciona listeners para envio dos formulários
+    // Adiciona listeners para os botões de ação
     if (tab === "buffet") {
-        document.getElementById("buffetForm").onsubmit = async function(e) {
-            e.preventDefault();
-            const form = e.target;
+        document.getElementById("criarBuffet").onclick = async function() {
+            const form = document.getElementById("buffetForm");
             const formData = new FormData(form);
+            const res = await fetch('http://localhost:3000/api/buffet', {
+                method: 'POST',
+                body: formData
+            });
+            document.getElementById("buffetMsg").innerText = res.ok ? "Buffet criado!" : "Erro ao criar.";
+        };
+        document.getElementById("atualizarBuffet").onclick = async function() {
+            const form = document.getElementById("buffetForm");
+            const formData = new FormData(form);
+            // ID fixo 1, ajuste conforme necessário
             const res = await fetch('http://localhost:3000/api/buffet/1', {
                 method: 'PUT',
                 body: formData
             });
             document.getElementById("buffetMsg").innerText = res.ok ? "Buffet atualizado!" : "Erro ao atualizar.";
         };
+        document.getElementById("deletarBuffet").onclick = async function() {
+            // ID fixo 1, ajuste conforme necessário
+            const res = await fetch('http://localhost:3000/api/buffet/1', {
+                method: 'DELETE'
+            });
+            document.getElementById("buffetMsg").innerText = res.ok ? "Buffet deletado!" : "Erro ao deletar.";
+        };
     }
     if (tab === "porcoes") {
-        document.getElementById("porcaoForm").onsubmit = async function(e) {
-            e.preventDefault();
-            const form = e.target;
+        document.getElementById("criarPorcao").onclick = async function() {
+            const form = document.getElementById("porcaoForm");
             const formData = new FormData(form);
             const res = await fetch('http://localhost:3000/api/porcoes', {
                 method: 'POST',
                 body: formData
             });
-            document.getElementById("porcaoMsg").innerText = res.ok ? "Porção adicionada!" : "Erro ao adicionar.";
+            document.getElementById("porcaoMsg").innerText = res.ok ? "Porção criada!" : "Erro ao criar.";
+        };
+        document.getElementById("atualizarPorcao").onclick = async function() {
+            const nome = prompt("Nome da porção para atualizar:");
+            if (!nome) return;
+            const form = document.getElementById("porcaoForm");
+            const formData = new FormData(form);
+            const res = await fetch(`http://localhost:3000/api/porcoes/nome/${encodeURIComponent(nome)}`, {
+                method: 'PUT',
+                body: formData
+            });
+            document.getElementById("porcaoMsg").innerText = res.ok ? "Porção atualizada!" : "Erro ao atualizar.";
+        };
+        document.getElementById("deletarPorcao").onclick = async function() {
+            const nome = prompt("Nome da porção para deletar:");
+            if (!nome) return;
+            const res = await fetch(`http://localhost:3000/api/porcoes/nome/${encodeURIComponent(nome)}`, {
+                method: 'DELETE'
+            });
+            document.getElementById("porcaoMsg").innerText = res.ok ? "Porção deletada!" : "Erro ao deletar.";
         };
     }
     if (tab === "drinks") {
-        document.getElementById("drinkForm").onsubmit = async function(e) {
-            e.preventDefault();
-            const form = e.target;
+        document.getElementById("criarDrink").onclick = async function() {
+            const form = document.getElementById("drinkForm");
             const formData = new FormData(form);
             const res = await fetch('http://localhost:3000/api/drinks', {
                 method: 'POST',
                 body: formData
             });
-            document.getElementById("drinkMsg").innerText = res.ok ? "Drink adicionado!" : "Erro ao adicionar.";
+            document.getElementById("drinkMsg").innerText = res.ok ? "Drink criado!" : "Erro ao criar.";
+        };
+        document.getElementById("atualizarDrink").onclick = async function() {
+            const nome = prompt("Nome do drink para atualizar:");
+            if (!nome) return;
+            const form = document.getElementById("drinkForm");
+            const formData = new FormData(form);
+            const res = await fetch(`http://localhost:3000/api/drinks/nome/${encodeURIComponent(nome)}`, {
+                method: 'PUT',
+                body: formData
+            });
+            document.getElementById("drinkMsg").innerText = res.ok ? "Drink atualizado!" : "Erro ao atualizar.";
+        };
+        document.getElementById("deletarDrink").onclick = async function() {
+            const nome = prompt("Nome do drink para deletar:");
+            if (!nome) return;
+            const res = await fetch(`http://localhost:3000/api/drinks/nome/${encodeURIComponent(nome)}`, {
+                method: 'DELETE'
+            });
+            document.getElementById("drinkMsg").innerText = res.ok ? "Drink deletado!" : "Erro ao deletar.";
         };
     }
 }

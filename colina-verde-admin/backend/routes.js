@@ -3,8 +3,6 @@ const bcrypt = require('bcrypt');
 const pool = require('./db');
 const multer = require('multer');
 const path = require('path');
-const router = express.Router();
-
 // Configuração do multer para salvar arquivos em /uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -17,6 +15,55 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage });
+const router = express.Router();
+
+// Atualiza porção pelo nome
+router.put('/porcoes/nome/:nome', upload.single('media'), async (req, res) => {
+  const { descricao, preco_inteira, preco_meia } = req.body;
+  let url_media = req.file ? `/uploads/${req.file.filename}` : req.body.url_imagem;
+  const nome = req.params.nome;
+  const result = await pool.query("UPDATE porcoes SET descricao=$1, preco_inteira=$2, preco_meia=$3, url_imagem=$4 WHERE nome_porcao=$5", [descricao, preco_inteira, preco_meia, url_media, nome]);
+  if (result.rowCount > 0) {
+    res.sendStatus(200);
+  } else {
+    res.status(404).json({ success: false, message: 'Porção não encontrada.' });
+  }
+});
+
+// Deleta porção pelo nome
+router.delete('/porcoes/nome/:nome', async (req, res) => {
+  const nome = req.params.nome;
+  const result = await pool.query("DELETE FROM porcoes WHERE nome_porcao = $1", [nome]);
+  if (result.rowCount > 0) {
+    res.sendStatus(204);
+  } else {
+    res.status(404).json({ success: false, message: 'Porção não encontrada.' });
+  }
+});
+
+// Atualiza drink pelo nome
+router.put('/drinks/nome/:nome', upload.single('media'), async (req, res) => {
+  const { descricao, preco, tamanho } = req.body;
+  let url_media = req.file ? `/uploads/${req.file.filename}` : req.body.url_imagem;
+  const nome = req.params.nome;
+  const result = await pool.query("UPDATE drinks SET descricao=$1, preco=$2, tamanho=$3, url_imagem=$4 WHERE nome_drink=$5", [descricao, preco, tamanho, url_media, nome]);
+  if (result.rowCount > 0) {
+    res.sendStatus(200);
+  } else {
+    res.status(404).json({ success: false, message: 'Drink não encontrado.' });
+  }
+});
+
+// Deleta drink pelo nome
+router.delete('/drinks/nome/:nome', async (req, res) => {
+  const nome = req.params.nome;
+  const result = await pool.query("DELETE FROM drinks WHERE nome_drink = $1", [nome]);
+  if (result.rowCount > 0) {
+    res.sendStatus(204);
+  } else {
+    res.status(404).json({ success: false, message: 'Drink não encontrado.' });
+  }
+});
 
 // Cadastro de administrador
 router.post('/register', async (req, res) => {
@@ -57,6 +104,14 @@ router.post('/login', async (req, res) => {
 router.get('/buffet', async (req, res) => {
   const result = await pool.query("SELECT * FROM buffet");
   res.json(result.rows);
+});
+
+// Cria buffet com preço, descrição e imagem/video
+router.post('/buffet', upload.single('media'), async (req, res) => {
+  const { preco_por_kg, descricao } = req.body;
+  let url_media = req.file ? `/uploads/${req.file.filename}` : null;
+  await pool.query("INSERT INTO buffet (preco_por_kg, descricao, url_imagem) VALUES ($1, $2, $3)", [preco_por_kg, descricao, url_media]);
+  res.sendStatus(201);
 });
 
 // Atualiza buffet com upload de imagem/video
