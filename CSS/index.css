@@ -1,3 +1,22 @@
+/* Botão de localização */
+.btn-localizacao {
+    margin-top: 10px;
+    background: #7bc043;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 18px;
+    font-size: 1rem;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-localizacao:hover {
+    background: #5fa032;
+    box-shadow: 0 4px 16px #7bc04355;
+}
 body {
     margin: 0;
     font-family: 'Montserrat', Arial, sans-serif;
