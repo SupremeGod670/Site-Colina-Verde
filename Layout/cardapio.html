@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cardápio - Colina Verde</title>
+    <link rel="stylesheet" href="../CSS/cardapio.css" />
+</head>
+
+<body>
+    <header>
+        <nav class="container header-content" aria-label="Menu principal">
+            <h1 class="logo">🌿 Colina Verde</h1>
+            <ul>
+                <li><a href="index.html">Início</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="cardapio">
+            <nav class="tab-menu" aria-label="Categorias do cardápio">
+                <button class="tab" onclick="showTab('buffet')" type="button">Buffet</button>
+                <button class="tab" onclick="showTab('porcoes')" type="button">Porções</button>
+                <button class="tab" onclick="showTab('drinks')" type="button">Drinks</button>
+            </nav>
+
+            <section class="tab-content" id="buffet">
+                <h2>🍽️ Buffet</h2>
+                <div id="buffet-items"></div>
+            </section>
+
+            <section class="tab-content" id="porcoes" style="display: none;">
+                <h2>🍟 Porções</h2>
+                <div style="text-align:center; margin-bottom:10px; color:#555; font-size:0.98rem;">
+                    <strong>Valores:</strong> <span style="color:#388e3c;">Porção Inteira</span> / <span
+                        style="color:#388e3c;">Meia Porção</span>
+                </div>
+                <ul id="porcoes-items" style="padding:0;"></ul>
+            </section>
+
+            <section class="tab-content" id="drinks" style="display: none;">
+                <h2>🍹 Drinks</h2>
+                <ul id="drinks-items"></ul>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(section => section.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).style.display = 'block';
+            document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+        // Detecta a aba a partir da URL
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab') || 'buffet';
+        showTab(tab);
+    </script>
+    <script src="../JS/cardapio.js"></script>
+    <script>
+        if (typeof window.createCardapio === 'function') {
+            window.createCardapio();
+        }
+    </script>
+    </script>
+</body>
+
+</html>
