@@ -1,81 +1,98 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Colina Verde Restaurante</title>
     <link rel="icon" href="../Icon/icone_colina_verde.ico">
-    <link rel="stylesheet" href="../CSS/index.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/index.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 
 <body>
+
     <header>
-        <nav class="header-content">
-            <span class="site-title">Colina Verde</span>
-            <img src="../Img/icone_colina_verde.png" alt="Logo Colina Verde" class="logo-header">
+        <nav class="container header-content" aria-label="Menu principal">
+            <h1 class="logo"><img src="../Img/icone_colina_verde.png" alt="Logo Colina Verde"
+                    style="height:32px;vertical-align:middle;margin-right:8px;">Colina Verde</h1>
+            <ul>
+                <li><a href="#">Início</a></li>
+                <li><a href="#cardapio">Cardápio</a></li>
+                <li><a href="https://wa.me/5548999265389" target="_blank">Contato</a></li>
+                <li><a href="https://maps.app.goo.gl/HPBLkGmLY99FR9hp9" target="_blank">Localização</a></li>
+            </ul>
         </nav>
     </header>
+
     <main>
-        <section class="carousel-section">
-            <button class="carousel-arrow left" id="prevBtn">&#60;</button>
-            <section class="carousel-container">
-                <img src="../Img/Carrosel.png" alt="Carrossel" class="carousel-img active">
-                <img src="../Img/Buffet.png" alt="Buffet" class="carousel-img">
-                <img src="../Img/Drinks.png" alt="Drinks" class="carousel-img">
-                <img src="../Img/Petiscos.png" alt="Petiscos" class="carousel-img">
+        <section class="hero">
+            <header class="overlay">
+                <h2>Comida caseira e saborosa</h2>
+                <p>Buffet, Porções e Drinks artesanais</p>
+                <a href="#cardapio" class="btn">Ver Cardápio</a>
+            </header>
+        </section>
+
+        <section class="cardapio" id="cardapio">
+            <h2>Nosso Cardápio</h2>
+            <section class="cards">
+                <article class="card">
+                    <figure>
+                        <img src="../Img/Buffet.png" alt="Buffet" />
+                        <figcaption>
+                            <h3>Buffet</h3>
+                            <p>Self-service variado com mais de 20 opções.</p>
+                        </figcaption>
+                    </figure>
+                </article>
+                <article class="card">
+                    <figure>
+                        <img src="../Img/Petiscos.png" alt="Porções" />
+                        <figcaption>
+                            <h3>Porções</h3>
+                            <p>Porções crocantes para compartilhar.</p>
+                        </figcaption>
+                    </figure>
+                </article>
+                <article class="card">
+                    <figure>
+                        <img src="../Img/Drinks.png" alt="Drinks" />
+                        <figcaption>
+                            <h3>Drinks</h3>
+                            <p>Bebidas refrescantes e autorais.</p>
+                        </figcaption>
+                    </figure>
+                </article>
             </section>
-            <button class="carousel-arrow right" id="nextBtn">&#62;</button>
         </section>
-        <section class="cards-section">
-            <article class="card">
-                <figure>
-                    <img src="../Img/Buffet.png" alt="Buffet" class="card-img">
-                    <p class="card-title">Buffet</p>
-                </figure>
-            </article>
-            <article class="card">
-                <figure>
-                    <img src="../Img/Petiscos.png" alt="Porções" class="card-img">
-                    <p class="card-title">Porções</p>
-                </figure>
-            </article>
-            <article class="card">
-                <figure>
-                    <img src="../Img/Drinks.png" alt="Drinks" class="card-img">
-                    <p class="card-title">Drinks</p>
-                </figure>
-            </article>
-        </section>
-        <section class="info-section">
-            <aside class="info-card">
-                <figure>
-                    <figcaption class="info-title">Endereço</figcaption>
-                    <a href="https://maps.app.goo.gl/HPBLkGmLY99FR9hp9" target="_blank" class="map-link">
-                        <img src="../Img/maps.webp" alt="Mapa" class="map-img" style="cursor:pointer;">
-                    </a>
-                </figure>
+
+        <section class="info">
+            <aside class="info-box">
+                <h3>📍 Endereço</h3>
+                <a href="https://maps.app.goo.gl/HPBLkGmLY99FR9hp9" target="_blank">
+                    <img src="../Img/maps.webp" alt="Mapa"
+                        style="width:100px;border-radius:8px;box-shadow:0 2px 8px #7bc04355;cursor:pointer;">
+                </a>
+                <address>R. Antônio Cardoso de Aguiar, 1018 - Mina Brasil, Criciúma - SC, 88813-013</address>
             </aside>
-            <aside class="info-card horarios">
-                <header class="info-title">Horários De Funcionamento</header>
-                <ul>
-                    <li>⏰Qua a Sab: 18h às 23h.</li>
-                    <li>⏰Sab e Dom: 11h às 14h.</li>
-                </ul>
+            <aside class="info-box">
+                <h3>⏰ Horários</h3>
+                <p>Qua a Sáb: 18h - 23h<br> Sáb e Dom: 11h - 14h</p>
             </aside>
         </section>
     </main>
+
     <footer>
-        <nav class="footer-content">
+        <p>© 2025 Colina Verde Restaurante — Feito com carinho 🌱</p>
+        <nav class="social" aria-label="Redes sociais">
             <a href="https://www.instagram.com/colinaverde_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-                class="social-icon" target="_blank"><img src="../Img/icone_instagram.webp" alt="Instagram"></a>
-            <a href="https://wa.me/5548999265389" class="social-icon" target="_blank"><img src="../Img/WhatsApp-icone.png" alt="WhatsApp"></a>
+                target="_blank"><img src="../Img/instagram_icon.png" alt="Instagram" /></a>
+            <a href="https://wa.me/5548999265389" target="_blank"><img src="../Img/WhatsApp-icone.png"
+                    alt="WhatsApp" /></a>
         </nav>
     </footer>
-    <script src="../JS/index.js"></script>
+
 </body>
 
 </html>
