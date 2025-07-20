@@ -228,7 +228,16 @@ function showTab(tab) {
                 method: 'POST',
                 body: formData
             });
-            document.getElementById("porcaoMsg").innerText = res.ok ? "Porção criada!" : "Erro ao criar.";
+            let msg = res.ok ? "Porção criada!" : "Erro ao criar.";
+            if (!res.ok) {
+                try {
+                    const data = await res.json();
+                    msg = data.message || data.error || "Erro ao criar.";
+                } catch {
+                    msg = "Erro ao criar.";
+                }
+            }
+            document.getElementById("porcaoMsg").innerText = msg;
             // Limpa campos do formulário porção se criado com sucesso
             if (res.ok) {
                 document.getElementById("porcaoForm").reset();
@@ -239,11 +248,27 @@ function showTab(tab) {
             if (!nome) return;
             const form = document.getElementById("porcaoForm");
             const formData = new FormData(form);
+            // Corrige campos numéricos vazios para null
+            ["preco_inteira", "preco_meia"].forEach(campo => {
+                const val = formData.get(campo);
+                if (val === "" || val === null) {
+                    formData.delete(campo);
+                }
+            });
             const res = await fetch(`http://localhost:3000/api/porcoes/nome/${encodeURIComponent(nome)}`, {
                 method: 'PUT',
                 body: formData
             });
-            document.getElementById("porcaoMsg").innerText = res.ok ? "Porção atualizada!" : "Erro ao atualizar.";
+            let msg = res.ok ? "Porção atualizada!" : "Erro ao atualizar.";
+            if (!res.ok) {
+                try {
+                    const data = await res.json();
+                    msg = data.message || data.error || "Erro ao atualizar.";
+                } catch {
+                    msg = "Erro ao atualizar.";
+                }
+            }
+            document.getElementById("porcaoMsg").innerText = msg;
         };
         document.getElementById("deletarPorcao").onclick = async function() {
             const nome = prompt("Nome da porção para deletar:");
