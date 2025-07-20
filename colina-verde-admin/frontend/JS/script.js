@@ -1,3 +1,17 @@
+// Função de logout
+function logout() {
+    localStorage.removeItem('colina_admin_logado');
+    document.getElementById("adminContainer").style.display = "none";
+    document.getElementById("loginContainer").style.display = "block";
+}
+
+// Adiciona listener ao botão de logout
+window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('logoutBtn');
+    if (btn) {
+        btn.onclick = logout;
+    }
+});
 async function login() {
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
@@ -8,12 +22,25 @@ async function login() {
     });
     const data = await res.json();
     if (data.success) {
+        localStorage.setItem('colina_admin_logado', 'true');
         document.getElementById("loginContainer").style.display = "none";
         document.getElementById("adminContainer").style.display = "block";
         showTab('buffet');
     } else {
+        localStorage.removeItem('colina_admin_logado');
         document.getElementById("loginMessage").innerText = "Usuário ou senha incorretos.";
     }
+// Verifica login ao carregar página
+window.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('colina_admin_logado') === 'true') {
+        document.getElementById("loginContainer").style.display = "none";
+        document.getElementById("adminContainer").style.display = "block";
+        showTab('buffet');
+    } else {
+        document.getElementById("loginContainer").style.display = "block";
+        document.getElementById("adminContainer").style.display = "none";
+    }
+});
 }
 
 function showTab(tab) {
