@@ -22,9 +22,10 @@ function showTab(tab) {
     if (tab === "buffet") {
         content = `
             <h2>Buffet</h2>
-            <form id="buffetForm" enctype="multipart/form-data" style="margin-top:20px;">
+            <form id="buffetForm" enctype="multipart/form-data" style="margin-top:20px;display:flex;flex-direction:column;gap:0;">
                 <label for="data_buffet" style="font-weight:600;margin-bottom:4px;">Data do Buffet:</label>
                 <input type="date" name="data_buffet" id="data_buffet" required class="input-date" style="margin-bottom:12px;">
+                <!-- O campo de horário será inserido dinamicamente -->
                 <label for="preco_por_kg" style="font-weight:600;margin-bottom:4px;">Preço por Kg:</label>
                 <input type="number" name="preco_por_kg" id="preco_por_kg" placeholder="R$" step="0.01" min="0" required style="margin-bottom:12px;">
                 <label for="descricao" style="font-weight:600;margin-bottom:4px;">Descrição:</label>
@@ -102,9 +103,10 @@ function showTab(tab) {
                     horarioSelect.className = "input-date";
                     horarioSelect.style.marginBottom = "12px";
                     horarioSelect.innerHTML = `<option value="">Selecione o horário</option><option value="11-14">11h às 14h</option><option value="16-23">16h às 23h</option>`;
-                    // Insere label e select
-                    this.parentNode.insertBefore(label, this.nextSibling);
-                    this.parentNode.insertBefore(horarioSelect, label.nextSibling);
+                    // Insere label e select logo após o campo de data
+                    const form = this.form;
+                    form.insertBefore(label, this.nextSibling);
+                    form.insertBefore(horarioSelect, label.nextSibling);
                 }
                         } else {
                             if (horarioSelect) {
@@ -166,7 +168,26 @@ function showTab(tab) {
                 method: 'POST',
                 body: formData
             });
-            document.getElementById("buffetMsg").innerText = res.ok ? "Buffet criado!" : "Erro ao criar.";
+            let msg = "Buffet criado!";
+            if (!res.ok) {
+                try {
+                    const data = await res.json();
+                    msg = data.message || data.error || "Erro ao criar.";
+                } catch {
+                    msg = "Erro ao criar.";
+                }
+            }
+            document.getElementById("buffetMsg").innerText = msg;
+            // Limpa campos do formulário buffet se criado com sucesso
+            if (res.ok) {
+                const form = document.getElementById("buffetForm");
+                form.reset();
+                // Remove campo de horário se existir
+                const horarioLabel = document.querySelector("label[for='horario_buffet']");
+                const horarioSelect = document.getElementById("horario_buffet");
+                if (horarioLabel) horarioLabel.remove();
+                if (horarioSelect) horarioSelect.remove();
+            }
         };
         document.getElementById("atualizarBuffet").onclick = async function() {
             const form = document.getElementById("buffetForm");
@@ -208,6 +229,10 @@ function showTab(tab) {
                 body: formData
             });
             document.getElementById("porcaoMsg").innerText = res.ok ? "Porção criada!" : "Erro ao criar.";
+            // Limpa campos do formulário porção se criado com sucesso
+            if (res.ok) {
+                document.getElementById("porcaoForm").reset();
+            }
         };
         document.getElementById("atualizarPorcao").onclick = async function() {
             const nome = prompt("Nome da porção para atualizar:");
@@ -238,6 +263,10 @@ function showTab(tab) {
                 body: formData
             });
             document.getElementById("drinkMsg").innerText = res.ok ? "Drink criado!" : "Erro ao criar.";
+            // Limpa campos do formulário drink se criado com sucesso
+            if (res.ok) {
+                document.getElementById("drinkForm").reset();
+            }
         };
         document.getElementById("atualizarDrink").onclick = async function() {
             const nome = prompt("Nome do drink para atualizar:");
