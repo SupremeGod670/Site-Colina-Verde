@@ -119,7 +119,7 @@ router.post('/login', async (req, res) => {
   return res.status(401).json({ success: false });
 });
 
-router.get('/buffet', authenticateToken, async (req, res) => {
+router.get('/buffet', async (req, res) => {
   const result = await pool.query("SELECT * FROM buffet");
   res.json(result.rows);
 });
@@ -187,7 +187,7 @@ router.put('/buffet/:id', authenticateToken, upload.single('media'), async (req,
   res.sendStatus(200);
 });
 
-router.get('/porcoes', authenticateToken, async (req, res) => {
+router.get('/porcoes', async (req, res) => {
   const result = await pool.query("SELECT * FROM porcoes");
   res.json(result.rows);
 });
@@ -213,7 +213,7 @@ router.delete('/porcoes/:id', authenticateToken, async (req, res) => {
   res.sendStatus(204);
 });
 
-router.get('/drinks', authenticateToken, async (req, res) => {
+router.get('/drinks', async (req, res) => {
   const result = await pool.query("SELECT * FROM drinks");
   res.json(result.rows);
 });
