@@ -110,15 +110,62 @@ router.get('/buffet', async (req, res) => {
 router.post('/buffet', upload.single('media'), async (req, res) => {
   const { preco_por_kg, descricao } = req.body;
   let url_media = req.file ? `/uploads/${req.file.filename}` : null;
-  await pool.query("INSERT INTO buffet (preco_por_kg, descricao, url_imagem) VALUES ($1, $2, $3)", [preco_por_kg, descricao, url_media]);
+  let data_buffet = req.body.data_buffet;
+  // Garante formato YYYY-MM-DD ou null
+  if (!data_buffet || !/^\d{4}-\d{2}-\d{2}$/.test(data_buffet)) {
+    return res.status(400).json({ success: false, message: 'Data do buffet inválida ou não informada.' });
+  }
+      let { horario_buffet } = req.body;
+      const d = new Date(data_buffet + "T00:00:00");
+      let horarioToSave = null;
+      if (d.getDay() === 6) {
+        if (!horario_buffet || (horario_buffet !== "11-14" && horario_buffet !== "16-23")) {
+          return res.status(400).json({ success: false, message: 'Horário obrigatório para sábado.' });
+        }
+        horarioToSave = horario_buffet === "11-14" ? "11:00:00" : "16:00:00";
+      } else {
+        horarioToSave = null;
+      }
+      // Verifica duplicidade
+      let count = 0;
+      if (d.getDay() === 6) {
+        // Sábado: impede mesmo horário duas vezes, permite dois horários distintos
+        const { rows } = await pool.query("SELECT COUNT(*) FROM buffet WHERE data_buffet = $1 AND horario_buffet = $2", [data_buffet, horarioToSave]);
+        count = parseInt(rows[0].count, 10);
+        if (count > 0) {
+          return res.status(400).json({ success: false, message: 'Já existe buffet para este sábado e horário!' });
+        }
+      } else {
+        // Outros dias: impede qualquer duplicidade de data
+        const { rows } = await pool.query("SELECT COUNT(*) FROM buffet WHERE data_buffet = $1", [data_buffet]);
+        count = parseInt(rows[0].count, 10);
+        if (count > 0) {
+          return res.status(400).json({ success: false, message: 'Já existe buffet para este dia!' });
+        }
+      }
+      await pool.query("INSERT INTO buffet (preco_por_kg, descricao, url_imagem, data_buffet, horario_buffet) VALUES ($1, $2, $3, $4, $5)", [preco_por_kg, descricao, url_media, data_buffet, horarioToSave]);
   res.sendStatus(201);
 });
 
 // Atualiza buffet com upload de imagem/video
 router.put('/buffet/:id', upload.single('media'), async (req, res) => {
-  const { preco_por_kg } = req.body;
+  const { preco_por_kg, descricao } = req.body;
   let url_media = req.file ? `/uploads/${req.file.filename}` : req.body.url_imagem;
-  await pool.query("UPDATE buffet SET preco_por_kg = $1, url_imagem = $2 WHERE id_buffet = $3", [preco_por_kg, url_media, req.params.id]);
+  let data_buffet = req.body.data_buffet;
+  if (!data_buffet || !/^\d{4}-\d{2}-\d{2}$/.test(data_buffet)) {
+    return res.status(400).json({ success: false, message: 'Data do buffet inválida ou não informada.' });
+  }
+      let { horario_buffet } = req.body;
+      const d = new Date(data_buffet + "T00:00:00");
+      if (d.getDay() === 6) {
+        if (!horario_buffet || (horario_buffet !== "11-14" && horario_buffet !== "16-23")) {
+          return res.status(400).json({ success: false, message: 'Horário obrigatório para sábado.' });
+        }
+        horario_buffet = horario_buffet === "11-14" ? "11:00:00" : "16:00:00";
+      } else {
+        horario_buffet = null;
+      }
+      await pool.query("UPDATE buffet SET preco_por_kg = $1, descricao = $2, url_imagem = $3, data_buffet = $4, horario_buffet = $5 WHERE id_buffet = $6", [preco_por_kg, descricao, url_media, data_buffet, horario_buffet, req.params.id]);
   res.sendStatus(200);
 });
 

@@ -17,6 +17,27 @@ input, button, textarea {
     padding: 10px;
     margin-top: 10px;
     font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #c9f4c9;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+input:focus, textarea:focus {
+    border-color: #3ca241;
+    outline: none;
+}
+
+.input-date {
+    background: #f7fff7;
+    color: #333;
+    border: 1.5px solid #c9f4c9;
+    border-radius: 6px;
+    font-size: 16px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(60,162,65,0.07);
 }
 .tabs {
     display: flex;

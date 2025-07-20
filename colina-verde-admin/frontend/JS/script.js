@@ -22,11 +22,15 @@ function showTab(tab) {
     if (tab === "buffet") {
         content = `
             <h2>Buffet</h2>
-            <form id="buffetForm" enctype="multipart/form-data">
-                <label>Preço por Kg:</label>
-                <input type="number" name="preco_por_kg" placeholder="R$">
-                <label>Imagem/Video:</label>
-                <input type="file" name="media" accept="image/*,video/*">
+            <form id="buffetForm" enctype="multipart/form-data" style="margin-top:20px;">
+                <label for="data_buffet" style="font-weight:600;margin-bottom:4px;">Data do Buffet:</label>
+                <input type="date" name="data_buffet" id="data_buffet" required class="input-date" style="margin-bottom:12px;">
+                <label for="preco_por_kg" style="font-weight:600;margin-bottom:4px;">Preço por Kg:</label>
+                <input type="number" name="preco_por_kg" id="preco_por_kg" placeholder="R$" step="0.01" min="0" required style="margin-bottom:12px;">
+                <label for="descricao" style="font-weight:600;margin-bottom:4px;">Descrição:</label>
+                <textarea name="descricao" id="descricao" placeholder="Descrição do buffet" rows="2" style="margin-bottom:12px;"></textarea>
+                <label for="media" style="font-weight:600;margin-bottom:4px;">Imagem/Video:</label>
+                <input type="file" name="media" id="media" accept="image/*,video/*" style="margin-bottom:12px;">
                 <button type="button" id="criarBuffet">Criar Buffet</button>
                 <button type="button" id="atualizarBuffet">Atualizar Buffet</button>
                 <button type="button" id="deletarBuffet">Deletar Buffet</button>
@@ -72,9 +76,92 @@ function showTab(tab) {
 
     // Adiciona listeners para os botões de ação
     if (tab === "buffet") {
+        // Adiciona campo de horário para sábado
+        setTimeout(() => {
+            const dateInput = document.getElementById("data_buffet");
+            if (dateInput && !dateInput._listenerAdded) {
+                dateInput.addEventListener("input", function() {
+                    const val = this.value;
+                    if (val) {
+                        const d = new Date(val + "T00:00:00");
+                        const day = d.getDay();
+                        let horarioSelect = document.getElementById("horario_buffet");
+                        if (day === 6) { // Sábado
+                if (!horarioSelect) {
+                    // Cria label estilizada
+                    const label = document.createElement("label");
+                    label.htmlFor = "horario_buffet";
+                    label.innerText = "Horário do Buffet:";
+                    label.style.fontWeight = "600";
+                    label.style.marginBottom = "4px";
+                    // Cria select estilizado
+                    horarioSelect = document.createElement("select");
+                    horarioSelect.id = "horario_buffet";
+                    horarioSelect.name = "horario_buffet";
+                    horarioSelect.required = true;
+                    horarioSelect.className = "input-date";
+                    horarioSelect.style.marginBottom = "12px";
+                    horarioSelect.innerHTML = `<option value="">Selecione o horário</option><option value="11-14">11h às 14h</option><option value="16-23">16h às 23h</option>`;
+                    // Insere label e select
+                    this.parentNode.insertBefore(label, this.nextSibling);
+                    this.parentNode.insertBefore(horarioSelect, label.nextSibling);
+                }
+                        } else {
+                            if (horarioSelect) {
+                                horarioSelect.remove();
+                            }
+                        }
+                        // Bloqueia segunda e terça
+                        if (day === 1 || day === 2) {
+                            this.value = "";
+                            this.setCustomValidity("Buffet não pode ser marcado para segunda ou terça-feira.");
+                            this.reportValidity();
+                        } else {
+                            this.setCustomValidity("");
+                        }
+                    }
+                });
+                dateInput._listenerAdded = true;
+            }
+        }, 0);
+
+        // Função para verificar duplicidade de data/hora
+        async function verificarDataBuffet(data, horario) {
+            const res = await fetch('http://localhost:3000/api/buffet');
+            const buffets = await res.json();
+            // Sábado: pode ter dois horários
+            const d = new Date(data + "T00:00:00");
+            const day = d.getDay();
+            if (day === 6) {
+                const count = buffets.filter(b => b.data_buffet === data && b.horario_buffet === horario).length;
+                return count >= 1;
+            } else {
+                const count = buffets.filter(b => b.data_buffet === data).length;
+                return count >= 1;
+            }
+        }
+
         document.getElementById("criarBuffet").onclick = async function() {
             const form = document.getElementById("buffetForm");
             const formData = new FormData(form);
+            const data = formData.get("data_buffet");
+            let horario = null;
+            const d = new Date(data + "T00:00:00");
+            if (d.getDay() === 6) {
+                horario = formData.get("horario_buffet");
+                if (!horario || (horario !== "11-14" && horario !== "16-23")) {
+                    document.getElementById("buffetMsg").innerText = "Selecione o horário do buffet para sábado.";
+                    return;
+                }
+                formData.set("horario_buffet", horario); // garante valor correto
+            } else {
+                formData.delete("horario_buffet");
+            }
+            const duplicado = await verificarDataBuffet(data, horario);
+            if (duplicado) {
+                document.getElementById("buffetMsg").innerText = d.getDay() === 6 ? "Já existe buffet para este sábado e horário!" : "Já existe buffet para este dia!";
+                return;
+            }
             const res = await fetch('http://localhost:3000/api/buffet', {
                 method: 'POST',
                 body: formData
@@ -84,6 +171,19 @@ function showTab(tab) {
         document.getElementById("atualizarBuffet").onclick = async function() {
             const form = document.getElementById("buffetForm");
             const formData = new FormData(form);
+            const data = formData.get("data_buffet");
+            let horario = null;
+            const d = new Date(data + "T00:00:00");
+            if (d.getDay() === 6) {
+                horario = formData.get("horario_buffet");
+                if (!horario || (horario !== "11-14" && horario !== "16-23")) {
+                    document.getElementById("buffetMsg").innerText = "Selecione o horário do buffet para sábado.";
+                    return;
+                }
+                formData.set("horario_buffet", horario);
+            } else {
+                formData.delete("horario_buffet");
+            }
             // ID fixo 1, ajuste conforme necessário
             const res = await fetch('http://localhost:3000/api/buffet/1', {
                 method: 'PUT',
