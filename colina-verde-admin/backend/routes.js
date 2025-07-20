@@ -3,6 +3,20 @@ const bcrypt = require('bcrypt');
 const pool = require('./db');
 const multer = require('multer');
 const path = require('path');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'colina_verde_secret';
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ success: false, message: 'Token não fornecido.' });
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ success: false, message: 'Token inválido.' });
+    req.user = user;
+    next();
+  });
+}
+
 // Configuração do multer para salvar arquivos em /uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -18,7 +32,7 @@ const upload = multer({ storage });
 const router = express.Router();
 
 // Atualiza porção pelo nome
-router.put('/porcoes/nome/:nome', upload.single('media'), async (req, res) => {
+router.put('/porcoes/nome/:nome', authenticateToken, upload.single('media'), async (req, res) => {
   const { descricao, preco_inteira, preco_meia } = req.body;
   let url_media = req.file ? `/uploads/${req.file.filename}` : req.body.url_imagem;
   const nome = req.params.nome;
@@ -31,18 +45,22 @@ router.put('/porcoes/nome/:nome', upload.single('media'), async (req, res) => {
 });
 
 // Deleta porção pelo nome
-router.delete('/porcoes/nome/:nome', async (req, res) => {
+router.delete('/porcoes/nome/:nome', authenticateToken, async (req, res) => {
   const nome = req.params.nome;
   const result = await pool.query("DELETE FROM porcoes WHERE nome_porcao = $1", [nome]);
   if (result.rowCount > 0) {
     res.sendStatus(204);
+    if (valid) {
+      const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '2h' });
+      return res.json({ success: true, token });
+    }
   } else {
     res.status(404).json({ success: false, message: 'Porção não encontrada.' });
   }
 });
 
 // Atualiza drink pelo nome
-router.put('/drinks/nome/:nome', upload.single('media'), async (req, res) => {
+router.put('/drinks/nome/:nome', authenticateToken, upload.single('media'), async (req, res) => {
   const { descricao, preco, tamanho } = req.body;
   let url_media = req.file ? `/uploads/${req.file.filename}` : req.body.url_imagem;
   const nome = req.params.nome;
@@ -55,7 +73,7 @@ router.put('/drinks/nome/:nome', upload.single('media'), async (req, res) => {
 });
 
 // Deleta drink pelo nome
-router.delete('/drinks/nome/:nome', async (req, res) => {
+router.delete('/drinks/nome/:nome', authenticateToken, async (req, res) => {
   const nome = req.params.nome;
   const result = await pool.query("DELETE FROM drinks WHERE nome_drink = $1", [nome]);
   if (result.rowCount > 0) {
@@ -101,13 +119,13 @@ router.post('/login', async (req, res) => {
   return res.status(401).json({ success: false });
 });
 
-router.get('/buffet', async (req, res) => {
+router.get('/buffet', authenticateToken, async (req, res) => {
   const result = await pool.query("SELECT * FROM buffet");
   res.json(result.rows);
 });
 
 // Cria buffet com preço, descrição e imagem/video
-router.post('/buffet', upload.single('media'), async (req, res) => {
+router.post('/buffet', authenticateToken, upload.single('media'), async (req, res) => {
   const { preco_por_kg, descricao } = req.body;
   let url_media = req.file ? `/uploads/${req.file.filename}` : null;
   let data_buffet = req.body.data_buffet;
@@ -148,7 +166,7 @@ router.post('/buffet', upload.single('media'), async (req, res) => {
 });
 
 // Atualiza buffet com upload de imagem/video
-router.put('/buffet/:id', upload.single('media'), async (req, res) => {
+router.put('/buffet/:id', authenticateToken, upload.single('media'), async (req, res) => {
   const { preco_por_kg, descricao } = req.body;
   let url_media = req.file ? `/uploads/${req.file.filename}` : req.body.url_imagem;
   let data_buffet = req.body.data_buffet;
@@ -169,13 +187,13 @@ router.put('/buffet/:id', upload.single('media'), async (req, res) => {
   res.sendStatus(200);
 });
 
-router.get('/porcoes', async (req, res) => {
+router.get('/porcoes', authenticateToken, async (req, res) => {
   const result = await pool.query("SELECT * FROM porcoes");
   res.json(result.rows);
 });
 
 // Adiciona porção com upload de imagem/video
-router.post('/porcoes', upload.single('media'), async (req, res) => {
+router.post('/porcoes', authenticateToken, upload.single('media'), async (req, res) => {
   let { nome_porcao, descricao, preco_inteira, preco_meia } = req.body;
   preco_inteira = preco_inteira === '' || preco_inteira === undefined ? null : preco_inteira;
   preco_meia = preco_meia === '' || preco_meia === undefined ? null : preco_meia;
@@ -184,37 +202,37 @@ router.post('/porcoes', upload.single('media'), async (req, res) => {
   res.sendStatus(201);
 });
 
-router.put('/porcoes/:id', async (req, res) => {
+router.put('/porcoes/:id', authenticateToken, async (req, res) => {
   const { nome_porcao, descricao, preco_inteira, preco_meia, url_imagem } = req.body;
   await pool.query("UPDATE porcoes SET nome_porcao=$1, descricao=$2, preco_inteira=$3, preco_meia=$4, url_imagem=$5 WHERE id_porcao = $6", [nome_porcao, descricao, preco_inteira, preco_meia, url_imagem, req.params.id]);
   res.sendStatus(200);
 });
 
-router.delete('/porcoes/:id', async (req, res) => {
+router.delete('/porcoes/:id', authenticateToken, async (req, res) => {
   await pool.query("DELETE FROM porcoes WHERE id_porcao = $1", [req.params.id]);
   res.sendStatus(204);
 });
 
-router.get('/drinks', async (req, res) => {
+router.get('/drinks', authenticateToken, async (req, res) => {
   const result = await pool.query("SELECT * FROM drinks");
   res.json(result.rows);
 });
 
 // Adiciona drink com upload de imagem/video
-router.post('/drinks', upload.single('media'), async (req, res) => {
+router.post('/drinks', authenticateToken, upload.single('media'), async (req, res) => {
   const { nome_drink, descricao, preco, tamanho } = req.body;
   let url_media = req.file ? `/uploads/${req.file.filename}` : null;
   await pool.query("INSERT INTO drinks (nome_drink, descricao, preco, tamanho, url_imagem) VALUES ($1, $2, $3, $4, $5)", [nome_drink, descricao, preco, tamanho, url_media]);
   res.sendStatus(201);
 });
 
-router.put('/drinks/:id', async (req, res) => {
+router.put('/drinks/:id', authenticateToken, async (req, res) => {
   const { nome_drink, descricao, preco, tamanho, url_imagem } = req.body;
   await pool.query("UPDATE drinks SET nome_drink=$1, descricao=$2, preco=$3, tamanho=$4, url_imagem=$5 WHERE id_drink = $6", [nome_drink, descricao, preco, tamanho, url_imagem, req.params.id]);
   res.sendStatus(200);
 });
 
-router.delete('/drinks/:id', async (req, res) => {
+router.delete('/drinks/:id', authenticateToken, async (req, res) => {
   await pool.query("DELETE FROM drinks WHERE id_drink = $1", [req.params.id]);
   res.sendStatus(204);
 });
