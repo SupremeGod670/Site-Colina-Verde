@@ -39,7 +39,10 @@ function resolveImageUrl(url) {
 
 async function fetchCardapio() {
   const buffetRes = await fetch('http://localhost:3000/api/buffet');
-  const buffetItens = await buffetRes.json();
+  let buffetItens = await buffetRes.json();
+
+  // Ordena em ordem crescente de data (calendário: do menor para o maior)
+  buffetItens.sort((a, b) => new Date(a.data_buffet) - new Date(b.data_buffet));
 
   const buffetList = document.getElementById("buffet-list");
   if (buffetList && Array.isArray(buffetItens)) {
