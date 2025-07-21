@@ -42,6 +42,7 @@ async function fetchCardapio() {
   const buffetRes = await fetch('http://localhost:3000/api/buffet');
   const buffetItens = await buffetRes.json();
   const buffetCarousel = document.querySelector("#buffet .carousel");
+  const buffetPrice = document.getElementById("buffet-price");
   if (buffetCarousel && Array.isArray(buffetItens)) {
     buffetCarousel.innerHTML = buffetItens.map(item => `
       <figure>
@@ -49,6 +50,13 @@ async function fetchCardapio() {
         <figcaption>${item.descricao || ''}</figcaption>
       </figure>
     `).join("");
+
+    // Mostra o preço do buffet (pega o primeiro item, ou adapte conforme sua lógica)
+    if (buffetItens.length > 0 && buffetItens[0].preco_por_kg) {
+      buffetPrice.textContent = `Buffet por Kg: R$ ${Number(buffetItens[0].preco_por_kg).toFixed(2).replace('.', ',')}`;
+    } else {
+      buffetPrice.textContent = '';
+    }
   }
 
   // Porções
