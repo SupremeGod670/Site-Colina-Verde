@@ -52,6 +52,28 @@
                     novo administrador</a>
             </aside>
         </section>
+        <!-- Formulário de Buffet com múltiplos uploads -->
+        <section id="buffetFormSection" style="display:none;">
+            <h3>Cadastrar Buffet</h3>
+            <form id="buffetForm" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:12px;max-width:400px;">
+                <label for="descricaoBuffet">Descrição</label>
+                <input type="text" id="descricaoBuffet" name="descricao" required>
+                <label for="precoBuffet">Preço por Kg</label>
+                <input type="number" id="precoBuffet" name="preco_por_kg" step="0.01" required>
+                <label for="dataBuffet">Data</label>
+                <input type="date" id="dataBuffet" name="data_buffet" required>
+                <label for="horarioBuffet">Horário</label>
+                <select id="horarioBuffet" name="horario_buffet">
+                    <option value="">Selecione</option>
+                    <option value="11-14">11h às 14h</option>
+                    <option value="16-23">16h às 23h</option>
+                </select>
+                <label for="mediaBuffet">Imagens/Vídeos do Buffet</label>
+                <input type="file" id="mediaBuffet" name="media" multiple accept="image/*,video/*">
+                <button type="submit" style="background:#3ca241;color:#fff;font-weight:600;border-radius:6px;padding:10px;">Salvar Buffet</button>
+            </form>
+            <div id="buffetFormMsg" style="color:#d32f2f;margin-top:8px;"></div>
+        </section>
     </main>
     <footer style="text-align:center;color:#888;font-size:0.95rem;margin-top:40px;">
         &copy; 2025 Colina Verde ADM

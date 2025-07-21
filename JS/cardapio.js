@@ -38,25 +38,63 @@ function resolveImageUrl(url) {
 }
 
 async function fetchCardapio() {
-  // Buffet
   const buffetRes = await fetch('http://localhost:3000/api/buffet');
   const buffetItens = await buffetRes.json();
-  const buffetCarousel = document.querySelector("#buffet .carousel");
-  const buffetPrice = document.getElementById("buffet-price");
-  if (buffetCarousel && Array.isArray(buffetItens)) {
-    buffetCarousel.innerHTML = buffetItens.map(item => `
-      <figure>
-        <img src="${resolveImageUrl(item.url_imagem)}" alt="${item.descricao || 'Buffet'}" style="width:100%;height:200px;object-fit:cover;border-radius:12px 12px 0 0;cursor:pointer;" onclick="expandImage('${resolveImageUrl(item.url_imagem)}','${item.descricao}')" tabindex="0" aria-label="Expandir imagem de ${item.descricao}">
-        <figcaption>${item.descricao || ''}</figcaption>
-      </figure>
+
+  const buffetList = document.getElementById("buffet-list");
+  if (buffetList && Array.isArray(buffetItens)) {
+    buffetList.innerHTML = buffetItens.map(item => `
+      <div class="buffet-block" style="margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid #e0e0e0;">
+        <h3 style="margin-bottom:6px;color:#388e3c;">
+          ${new Date(item.data_buffet).toLocaleDateString('pt-BR')}
+        </h3>
+        <div class="buffet-carousel" style="position:relative;max-width:600px;margin-bottom:18px;">
+          <button class="carousel-btn left" aria-label="Imagem anterior" style="position:absolute;top:50%;left:0;transform:translateY(-50%);background:#fff;border:none;border-radius:50%;box-shadow:0 2px 8px #0002;padding:8px;cursor:pointer;z-index:2;font-size:1.5rem;">&#8249;</button>
+          <div class="carousel-track" style="overflow:hidden;width:100%;height:220px;display:flex;align-items:center;">
+            ${item.url_imagem.map((url, idx) => `
+              <div class="carousel-item" data-index="${idx}" style="min-width:100%;transition:transform 0.5s;">
+                ${url.match(/\.(mp4|webm|ogg)$/i)
+                  ? `<video src="http://localhost:3000${url}" controls style="width:100%;height:220px;object-fit:cover;border-radius:12px;"></video>`
+                  : `<img src="http://localhost:3000${url}" alt="Buffet" style="width:100%;height:220px;object-fit:cover;border-radius:12px;cursor:pointer;" onclick="expandImage('http://localhost:3000${url}','Buffet')" tabindex="0">`
+                }
+              </div>
+            `).join('')}
+          </div>
+          <button class="carousel-btn right" aria-label="Próxima imagem" style="position:absolute;top:50%;right:0;transform:translateY(-50%);background:#fff;border:none;border-radius:50%;box-shadow:0 2px 8px #0002;padding:8px;cursor:pointer;z-index:2;font-size:1.5rem;">&#8250;</button>
+        </div>
+        <div style="flex:1;min-width:180px;">
+          <div style="font-size:1.05rem;margin-bottom:8px;">${item.descricao || ''}</div>
+          <div style="font-weight:bold;color:#388e3c;">
+            Buffet por Kg: R$ ${Number(item.preco_por_kg).toFixed(2).replace('.', ',')}
+          </div>
+          ${item.horario_buffet ? `<div style="color:#555;">Horário: ${item.horario_buffet}</div>` : ''}
+        </div>
+      </div>
     `).join("");
 
-    // Mostra o preço do buffet (pega o primeiro item, ou adapte conforme sua lógica)
-    if (buffetItens.length > 0 && buffetItens[0].preco_por_kg) {
-      buffetPrice.textContent = `Buffet por Kg: R$ ${Number(buffetItens[0].preco_por_kg).toFixed(2).replace('.', ',')}`;
-    } else {
-      buffetPrice.textContent = '';
-    }
+    // Ativa o carrosel para cada bloco
+    document.querySelectorAll('.buffet-carousel').forEach(carousel => {
+      const track = carousel.querySelector('.carousel-track');
+      const items = carousel.querySelectorAll('.carousel-item');
+      let current = 0;
+
+      function updateCarousel() {
+        items.forEach((item, idx) => {
+          item.style.transform = `translateX(-${current * 100}%)`;
+        });
+      }
+
+      carousel.querySelector('.carousel-btn.left').onclick = () => {
+        current = (current - 1 + items.length) % items.length;
+        updateCarousel();
+      };
+      carousel.querySelector('.carousel-btn.right').onclick = () => {
+        current = (current + 1) % items.length;
+        updateCarousel();
+      };
+
+      updateCarousel();
+    });
   }
 
   // Porções

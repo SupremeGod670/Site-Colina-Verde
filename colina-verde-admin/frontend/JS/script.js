@@ -30,8 +30,8 @@ function showTab(tab) {
                 <input type="number" name="preco_por_kg" id="preco_por_kg" placeholder="R$" step="0.01" min="0" required style="margin-bottom:12px;">
                 <label for="descricao" style="font-weight:600;margin-bottom:4px;">Descrição:</label>
                 <textarea name="descricao" id="descricao" placeholder="Descrição do buffet" rows="2" style="margin-bottom:12px;"></textarea>
-                <label for="media" style="font-weight:600;margin-bottom:4px;">Imagem/Video:</label>
-                <input type="file" name="media" id="media" accept="image/*,video/*" style="margin-bottom:12px;">
+                <label for="media" style="font-weight:600;margin-bottom:4px;">Imagens/Vídeos:</label>
+                <input type="file" name="media" id="media" accept="image/*,video/*" multiple style="margin-bottom:12px;">
                 <button type="button" id="criarBuffet">Criar Buffet</button>
                 <button type="button" id="atualizarBuffet">Atualizar Buffet</button>
                 <button type="button" id="deletarBuffet">Deletar Buffet</button>
