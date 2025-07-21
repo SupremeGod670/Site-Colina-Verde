@@ -102,7 +102,7 @@ function showTab(tab) {
                     horarioSelect.required = true;
                     horarioSelect.className = "input-date";
                     horarioSelect.style.marginBottom = "12px";
-                    horarioSelect.innerHTML = `<option value="">Selecione o horário</option><option value="11-14">11h às 14h</option><option value="16-23">16h às 23h</option>`;
+                    horarioSelect.innerHTML = `<option value="">Selecione o horário</option><option value="11-14">11h às 14h</option><option value="18-23">18h às 23h</option>`;
                     // Insere label e select logo após o campo de data
                     const form = this.form;
                     form.insertBefore(label, this.nextSibling);
@@ -151,7 +151,7 @@ function showTab(tab) {
             const d = new Date(data + "T00:00:00");
             if (d.getDay() === 6) {
                 horario = formData.get("horario_buffet");
-                if (!horario || (horario !== "11-14" && horario !== "16-23")) {
+                if (!horario || (horario !== "11-14" && horario !== "18-23")) {
                     document.getElementById("buffetMsg").innerText = "Selecione o horário do buffet para sábado.";
                     return;
                 }
@@ -197,7 +197,7 @@ function showTab(tab) {
             const d = new Date(data + "T00:00:00");
             if (d.getDay() === 6) {
                 horario = formData.get("horario_buffet");
-                if (!horario || (horario !== "11-14" && horario !== "16-23")) {
+                if (!horario || (horario !== "11-14" && horario !== "18-23")) {
                     document.getElementById("buffetMsg").innerText = "Selecione o horário do buffet para sábado.";
                     return;
                 }
