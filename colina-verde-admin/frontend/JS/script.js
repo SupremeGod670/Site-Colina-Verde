@@ -25,7 +25,9 @@ function showTab(tab) {
             <form id="buffetForm" enctype="multipart/form-data" style="margin-top:20px;display:flex;flex-direction:column;gap:0;">
                 <label for="data_buffet" style="font-weight:600;margin-bottom:4px;">Data do Buffet:</label>
                 <input type="date" name="data_buffet" id="data_buffet" required class="input-date" style="margin-bottom:12px;">
-                <!-- O campo de horário será inserido dinamicamente -->
+                <!-- O campo de horário será inserido dinamicamente aqui -->
+                <div id="horario_buffet_container"></div>
+                
                 <label for="preco_por_kg" style="font-weight:600;margin-bottom:4px;">Preço por Kg:</label>
                 <input type="number" name="preco_por_kg" id="preco_por_kg" placeholder="R$" step="0.01" min="0" required style="margin-bottom:12px;">
                 <label for="descricao" style="font-weight:600;margin-bottom:4px;">Descrição:</label>
@@ -77,93 +79,147 @@ function showTab(tab) {
 
     // Adiciona listeners para os botões de ação
     if (tab === "buffet") {
-        // Adiciona campo de horário para sábado
-        setTimeout(() => {
-            const dateInput = document.getElementById("data_buffet");
-            if (dateInput && !dateInput._listenerAdded) {
-                dateInput.addEventListener("input", function() {
-                    const val = this.value;
-                    if (val) {
-                        const d = new Date(val + "T00:00:00");
-                        const day = d.getDay();
-                        let horarioSelect = document.getElementById("horario_buffet");
-                        if (day === 6) { // Sábado
-                if (!horarioSelect) {
-                    // Cria label estilizada
-                    const label = document.createElement("label");
-                    label.htmlFor = "horario_buffet";
-                    label.innerText = "Horário do Buffet:";
-                    label.style.fontWeight = "600";
-                    label.style.marginBottom = "4px";
-                    // Cria select estilizado
-                    horarioSelect = document.createElement("select");
-                    horarioSelect.id = "horario_buffet";
-                    horarioSelect.name = "horario_buffet";
-                    horarioSelect.required = true;
-                    horarioSelect.className = "input-date";
-                    horarioSelect.style.marginBottom = "12px";
-                    horarioSelect.innerHTML = `<option value="">Selecione o horário</option><option value="11-14">11h às 14h</option><option value="18-23">18h às 23h</option>`;
-                    // Insere label e select logo após o campo de data
-                    const form = this.form;
-                    form.insertBefore(label, this.nextSibling);
-                    form.insertBefore(horarioSelect, label.nextSibling);
-                }
-                        } else {
-                            if (horarioSelect) {
-                                horarioSelect.remove();
-                            }
-                        }
-                        // Bloqueia segunda e terça
-                        if (day === 1 || day === 2) {
-                            this.value = "";
-                            this.setCustomValidity("Buffet não pode ser marcado para segunda ou terça-feira.");
-                            this.reportValidity();
-                        } else {
-                            this.setCustomValidity("");
-                        }
-                    }
-                });
-                dateInput._listenerAdded = true;
+        const dateInput = document.getElementById("data_buffet");
+        const horarioContainer = document.getElementById("horario_buffet_container");
+
+        // Função para gerar o campo de input de horário com datalist
+        function generateHorarioInput(day) {
+            let placeholderText = '';
+            let datalistOptions = '';
+            let isRequired = false;
+            let defaultValue = ''; // Para pré-preencher o campo
+
+            horarioContainer.innerHTML = ''; // Limpa elementos anteriores
+
+            if (day === 1 || day === 2) { // Segunda ou Terça
+                return; // Nenhum input para esses dias
+            } else if (day >= 3 && day <= 5) { // Quarta, Quinta, Sexta
+                placeholderText = "Ex: 18-23 ou 19:30";
+                datalistOptions = `<option value="18-23">`; // Sugestão
+                defaultValue = "18-23"; // Padrão para estes dias
+                isRequired = true;
+            } else if (day === 6) { // Sábado
+                placeholderText = "Ex: 11-14, 18-23 ou 15:00";
+                datalistOptions = `
+                    <option value="11-14">
+                    <option value="18-23">
+                `;
+                isRequired = true;
+            } else if (day === 0) { // Domingo
+                placeholderText = "Ex: 11-14 ou 12:00";
+                datalistOptions = `<option value="11-14">`; // Sugestão
+                defaultValue = "11-14"; // Padrão para Domingo
+                isRequired = true;
             }
-        }, 0);
+
+            if (placeholderText) {
+                const label = document.createElement("label");
+                label.htmlFor = "horario_buffet";
+                label.innerText = "Horário do Buffet:";
+                label.style.fontWeight = "600";
+                label.style.marginBottom = "4px";
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.id = "horario_buffet";
+                input.name = "horario_buffet";
+                input.placeholder = placeholderText;
+                input.className = "input-date";
+                input.style.marginBottom = "12px";
+                input.setAttribute('list', 'horarioSuggestions'); // Vincula ao datalist
+                input.required = isRequired;
+                input.value = defaultValue; // Define o valor padrão
+
+                const datalist = document.createElement("datalist");
+                datalist.id = "horarioSuggestions";
+                datalist.innerHTML = datalistOptions;
+
+                horarioContainer.appendChild(label);
+                horarioContainer.appendChild(input);
+                horarioContainer.appendChild(datalist);
+            }
+        }
+
+        // Listener para o campo de data
+        dateInput.addEventListener("input", function() {
+            const val = this.value;
+            if (val) {
+                const d = new Date(val + "T00:00:00");
+                const day = d.getDay(); // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
+
+                // Bloqueia segunda e terça no frontend e exibe mensagem
+                if (day === 1 || day === 2) {
+                    this.value = ""; // Limpa a data selecionada
+                    horarioContainer.innerHTML = ''; // Remove o campo de horário
+                    document.getElementById("buffetMsg").innerText = "Buffet não pode ser marcado para segunda ou terça-feira.";
+                    return;
+                } else {
+                    document.getElementById("buffetMsg").innerText = ""; // Limpa mensagem de erro
+                }
+                generateHorarioInput(day); // Chama a nova função para gerar o input de horário
+            } else {
+                horarioContainer.innerHTML = ''; // Limpa o campo de horário se a data for removida
+            }
+        });
 
         // Função para verificar duplicidade de data/hora
         async function verificarDataBuffet(data, horario) {
             const res = await fetch('http://localhost:3000/api/buffet');
             const buffets = await res.json();
-            // Sábado: pode ter dois horários
+            
+            // O backend espera o formato "HH:MM:SS" para comparação,
+            // então precisamos simular a conversão do backend para a verificação de duplicidade no frontend.
+            let horarioBackendFormat = null;
             const d = new Date(data + "T00:00:00");
             const day = d.getDay();
-            if (day === 6) {
-                const count = buffets.filter(b => b.data_buffet === data && b.horario_buffet === horario).length;
-                return count >= 1;
+
+            if (horario === "11-14") {
+                horarioBackendFormat = "11:00:00";
+            } else if (horario === "18-23") {
+                horarioBackendFormat = "18:00:00";
             } else {
-                const count = buffets.filter(b => b.data_buffet === data).length;
-                return count >= 1;
+                // Tenta analisar como HH:MM customizado
+                const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/; // Formato HH:MM
+                if (timeRegex.test(horario)) {
+                    horarioBackendFormat = `${horario}:00`;
+                }
             }
+
+            // Se nenhum formato válido pôde ser derivado, e o horário é obrigatório para o dia,
+            // isso significa que a entrada é inválida, então não será uma duplicata de uma entrada válida.
+            // O backend irá capturar o formato inválido.
+            if (!horarioBackendFormat && horario && (day >= 3 && day <= 6 || day === 0)) { 
+                return false; // Não é uma duplicata de uma entrada válida, mas pode ser um formato inválido
+            }
+
+            const count = buffets.filter(b => b.data_buffet === data && b.horario_buffet === horarioBackendFormat).length;
+            return count >= 1;
         }
 
         document.getElementById("criarBuffet").onclick = async function() {
             const form = document.getElementById("buffetForm");
             const formData = new FormData(form);
             const data = formData.get("data_buffet");
-            let horario = null;
+            const horarioInputElement = document.getElementById("horario_buffet");
+            let horario = horarioInputElement ? horarioInputElement.value : null;
+
             const d = new Date(data + "T00:00:00");
-            if (d.getDay() === 6) {
-                horario = formData.get("horario_buffet");
-                if (!horario || (horario !== "11-14" && horario !== "18-23")) {
-                    document.getElementById("buffetMsg").innerText = "Selecione o horário do buffet para sábado.";
-                    return;
-                }
-                formData.set("horario_buffet", horario); // garante valor correto
-            } else {
-                formData.delete("horario_buffet");
-            }
-            const duplicado = await verificarDataBuffet(data, horario);
-            if (duplicado) {
-                document.getElementById("buffetMsg").innerText = d.getDay() === 6 ? "Já existe buffet para este sábado e horário!" : "Já existe buffet para este dia!";
+            const day = d.getDay();
+
+            // Validação de horário para todos os dias válidos se o campo estiver vazio
+            if ((day >= 3 && day <= 6 || day === 0) && !horario) {
+                document.getElementById("buffetMsg").innerText = "Por favor, digite ou selecione o horário do buffet.";
                 return;
             }
+
+            formData.set("horario_buffet", horario); // Garante que o valor digitado/sugerido seja enviado (ex: "18-23" ou "19:30")
+            
+            const duplicado = await verificarDataBuffet(data, horario);
+            if (duplicado) {
+                document.getElementById("buffetMsg").innerText = `Já existe buffet para esta data (${data}) e horário!`;
+                return;
+            }
+
             const res = await fetch('http://localhost:3000/api/buffet', {
                 method: 'POST',
                 body: formData
@@ -180,41 +236,53 @@ function showTab(tab) {
             document.getElementById("buffetMsg").innerText = msg;
             // Limpa campos do formulário buffet se criado com sucesso
             if (res.ok) {
-                const form = document.getElementById("buffetForm");
                 form.reset();
-                // Remove campo de horário se existir
-                const horarioLabel = document.querySelector("label[for='horario_buffet']");
-                const horarioSelect = document.getElementById("horario_buffet");
-                if (horarioLabel) horarioLabel.remove();
-                if (horarioSelect) horarioSelect.remove();
+                horarioContainer.innerHTML = ''; // Remove o campo de horário dinâmico
             }
         };
+
         document.getElementById("atualizarBuffet").onclick = async function() {
+            const buffetId = prompt("ID do buffet para atualizar:"); // Solicita o ID para atualização
+            if (!buffetId) return;
+
             const form = document.getElementById("buffetForm");
             const formData = new FormData(form);
             const data = formData.get("data_buffet");
-            let horario = null;
+            const horarioInputElement = document.getElementById("horario_buffet");
+            let horario = horarioInputElement ? horarioInputElement.value : null;
+
             const d = new Date(data + "T00:00:00");
-            if (d.getDay() === 6) {
-                horario = formData.get("horario_buffet");
-                if (!horario || (horario !== "11-14" && horario !== "18-23")) {
-                    document.getElementById("buffetMsg").innerText = "Selecione o horário do buffet para sábado.";
-                    return;
-                }
-                formData.set("horario_buffet", horario);
-            } else {
-                formData.delete("horario_buffet");
+            const day = d.getDay();
+
+            // Validação de horário para todos os dias válidos se o campo estiver vazio
+            if ((day >= 3 && day <= 6 || day === 0) && !horario) {
+                document.getElementById("buffetMsg").innerText = "Por favor, digite ou selecione o horário do buffet.";
+                return;
             }
-            // ID fixo 1, ajuste conforme necessário
-            const res = await fetch('http://localhost:3000/api/buffet/1', {
+
+            formData.set("horario_buffet", horario); // Garante que o valor digitado/sugerido seja enviado (ex: "18-23" ou "19:30")
+
+            const res = await fetch(`http://localhost:3000/api/buffet/${buffetId}`, {
                 method: 'PUT',
                 body: formData
             });
-            document.getElementById("buffetMsg").innerText = res.ok ? "Buffet atualizado!" : "Erro ao atualizar.";
+            let msg = res.ok ? "Buffet atualizado!" : "Erro ao atualizar.";
+            if (!res.ok) {
+                try {
+                    const data = await res.json();
+                    msg = data.message || data.error || "Erro ao atualizar.";
+                } catch {
+                    msg = "Erro ao atualizar.";
+                }
+            }
+            document.getElementById("buffetMsg").innerText = msg;
         };
+
         document.getElementById("deletarBuffet").onclick = async function() {
-            // ID fixo 1, ajuste conforme necessário
-            const res = await fetch('http://localhost:3000/api/buffet/1', {
+            const buffetId = prompt("ID do buffet para deletar:"); // Solicita o ID para deletar
+            if (!buffetId) return;
+
+            const res = await fetch(`http://localhost:3000/api/buffet/${buffetId}`, {
                 method: 'DELETE'
             });
             document.getElementById("buffetMsg").innerText = res.ok ? "Buffet deletado!" : "Erro ao deletar.";
