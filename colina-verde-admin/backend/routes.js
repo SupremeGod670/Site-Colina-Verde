@@ -114,6 +114,29 @@ router.get('/buffet', async (req, res) => {
     res.json(buffets);
 });
 
+// Função auxiliar para validar o formato do horário
+function validateHorarioFormat(horario_buffet) {
+    // Regex para HH-HH (ex: 11-14, 18-23)
+    const rangeRegex = /^(\d{2})-(\d{2})$/;
+    // Regex para HH:MM (ex: 19:30)
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+    const rangeMatch = horario_buffet.match(rangeRegex);
+    const timeMatch = horario_buffet.match(timeRegex);
+
+    if (rangeMatch) {
+        const startHour = parseInt(rangeMatch[1], 10);
+        const endHour = parseInt(rangeMatch[2], 10);
+        // Basic validation for hours
+        if (startHour >= 0 && startHour <= 23 && endHour >= 0 && endHour <= 23 && startHour < endHour) {
+            return true; // Formato HH-HH válido
+        }
+    } else if (timeMatch) {
+        return true; // Formato HH:MM válido
+    }
+    return false; // Formato inválido
+}
+
 // Cria buffet com preço, descrição e imagem/video
 router.post('/buffet', upload.array('media'), async (req, res) => {
     const { preco_por_kg, descricao, data_buffet, horario_buffet } = req.body;
@@ -125,13 +148,6 @@ router.post('/buffet', upload.array('media'), async (req, res) => {
     const d = new Date(data_buffet + "T00:00:00");
     const day = d.getDay(); // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
 
-    let horarioToSave = null;
-
-    // Regex para HH-HH (ex: 11-14, 18-23)
-    const rangeRegex = /^(\d{2})-(\d{2})$/;
-    // Regex para HH:MM (ex: 19:30)
-    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-
     if (day === 1 || day === 2) { // Segunda ou Terça
         return res.status(400).json({ success: false, message: 'Buffet não pode ser marcado para segunda ou terça-feira.' });
     }
@@ -140,40 +156,27 @@ router.post('/buffet', upload.array('media'), async (req, res) => {
         return res.status(400).json({ success: false, message: 'Horário do buffet é obrigatório para este dia.' });
     }
 
-    const rangeMatch = horario_buffet.match(rangeRegex);
-    const timeMatch = horario_buffet.match(timeRegex);
-
-    if (rangeMatch) {
-        const startHour = parseInt(rangeMatch[1], 10);
-        const endHour = parseInt(rangeMatch[2], 10);
-        // Basic validation for hours
-        if (startHour >= 0 && startHour <= 23 && endHour >= 0 && endHour <= 23 && startHour < endHour) {
-            horarioToSave = `${String(startHour).padStart(2, '0')}:00:00`;
-        } else {
-            return res.status(400).json({ success: false, message: 'Formato de horário de intervalo inválido. Use HH-HH com horas válidas (00-23) e início menor que fim.' });
-        }
-    } else if (timeMatch) {
-        horarioToSave = `${horario_buffet}:00`;
-    } else {
+    // Valida o formato do horário
+    if (!validateHorarioFormat(horario_buffet)) {
         return res.status(400).json({ success: false, message: 'Formato de horário inválido. Use HH-HH (ex: 11-14) ou HH:MM (ex: 19:30).' });
     }
 
-    // Verifica duplicidade de data e horário
+    // Verifica duplicidade de data e horário (agora comparando a string exata)
     const { rows: existingBuffets } = await pool.query(
         "SELECT COUNT(*) FROM buffet WHERE data_buffet = $1 AND horario_buffet = $2",
-        [data_buffet, horarioToSave]
+        [data_buffet, horario_buffet] // Compara a string exata do horário
     );
     const count = parseInt(existingBuffets[0].count, 10);
 
     if (count > 0) {
-        return res.status(400).json({ success: false, message: `Já existe buffet para esta data (${data_buffet}) e horário (${horarioToSave ? horarioToSave.substring(0,5) : 'não especificado'})!` });
+        return res.status(400).json({ success: false, message: `Já existe buffet para esta data (${data_buffet}) e horário (${horario_buffet})!` });
     }
 
     // Insere buffet
     const result = await pool.query(
         `INSERT INTO buffet (preco_por_kg, descricao, data_buffet, horario_buffet)
          VALUES ($1, $2, $3, $4) RETURNING *`,
-        [preco_por_kg, descricao, data_buffet, horarioToSave]
+        [preco_por_kg, descricao, data_buffet, horario_buffet] // Salva a string de horário como está
     );
     const buffet = result.rows[0];
 
@@ -202,13 +205,6 @@ router.put('/buffet/:id', upload.array('media'), async (req, res) => {
     const d = new Date(data_buffet + "T00:00:00");
     const day = d.getDay(); // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
 
-    let horarioToSave = null;
-
-    // Regex para HH-HH (ex: 11-14, 18-23)
-    const rangeRegex = /^(\d{2})-(\d{2})$/;
-    // Regex para HH:MM (ex: 19:30)
-    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-
     if (day === 1 || day === 2) { // Segunda ou Terça
         return res.status(400).json({ success: false, message: 'Buffet não pode ser marcado para segunda ou terça-feira.' });
     }
@@ -217,38 +213,25 @@ router.put('/buffet/:id', upload.array('media'), async (req, res) => {
         return res.status(400).json({ success: false, message: 'Horário do buffet é obrigatório para este dia.' });
     }
 
-    const rangeMatch = horario_buffet.match(rangeRegex);
-    const timeMatch = horario_buffet.match(timeRegex);
-
-    if (rangeMatch) {
-        const startHour = parseInt(rangeMatch[1], 10);
-        const endHour = parseInt(rangeMatch[2], 10);
-        // Basic validation for hours
-        if (startHour >= 0 && startHour <= 23 && endHour >= 0 && endHour <= 23 && startHour < endHour) {
-            horarioToSave = `${String(startHour).padStart(2, '0')}:00:00`;
-        } else {
-            return res.status(400).json({ success: false, message: 'Formato de horário de intervalo inválido. Use HH-HH com horas válidas (00-23) e início menor que fim.' });
-        }
-    } else if (timeMatch) {
-        horarioToSave = `${horario_buffet}:00`;
-    } else {
+    // Valida o formato do horário
+    if (!validateHorarioFormat(horario_buffet)) {
         return res.status(400).json({ success: false, message: 'Formato de horário inválido. Use HH-HH (ex: 11-14) ou HH:MM (ex: 19:30).' });
     }
 
     // Verifica duplicidade para atualização (exclui o próprio buffet que está sendo atualizado)
     const { rows: existingBuffets } = await pool.query(
         "SELECT COUNT(*) FROM buffet WHERE data_buffet = $1 AND horario_buffet = $2 AND id_buffet != $3",
-        [data_buffet, horarioToSave, buffetId]
+        [data_buffet, horario_buffet, buffetId] // Compara a string exata do horário
     );
     const count = parseInt(existingBuffets[0].count, 10);
 
     if (count > 0) {
-        return res.status(400).json({ success: false, message: `Já existe outro buffet para esta data (${data_buffet}) e horário (${horarioToSave ? horarioToSave.substring(0,5) : 'não especificado'})!` });
+        return res.status(400).json({ success: false, message: `Já existe outro buffet para esta data (${data_buffet}) e horário (${horario_buffet})!` });
     }
 
     await pool.query(
         "UPDATE buffet SET preco_por_kg = $1, descricao = $2, data_buffet = $3, horario_buffet = $4 WHERE id_buffet = $5",
-        [preco_por_kg, descricao, data_buffet, horarioToSave, buffetId]
+        [preco_por_kg, descricao, data_buffet, horario_buffet, buffetId] // Salva a string de horário como está
     );
 
     // Remove imagens antigas e insere novas se houver upload

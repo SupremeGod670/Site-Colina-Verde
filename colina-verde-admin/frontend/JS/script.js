@@ -162,37 +162,13 @@ function showTab(tab) {
             }
         });
 
-        // Função para verificar duplicidade de data/hora
+        // Função para verificar duplicidade de data/hora (agora compara as strings de horário diretamente)
         async function verificarDataBuffet(data, horario) {
             const res = await fetch('http://localhost:3000/api/buffet');
             const buffets = await res.json();
             
-            // O backend espera o formato "HH:MM:SS" para comparação,
-            // então precisamos simular a conversão do backend para a verificação de duplicidade no frontend.
-            let horarioBackendFormat = null;
-            const d = new Date(data + "T00:00:00");
-            const day = d.getDay();
-
-            if (horario === "11-14") {
-                horarioBackendFormat = "11:00:00";
-            } else if (horario === "18-23") {
-                horarioBackendFormat = "18:00:00";
-            } else {
-                // Tenta analisar como HH:MM customizado
-                const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/; // Formato HH:MM
-                if (timeRegex.test(horario)) {
-                    horarioBackendFormat = `${horario}:00`;
-                }
-            }
-
-            // Se nenhum formato válido pôde ser derivado, e o horário é obrigatório para o dia,
-            // isso significa que a entrada é inválida, então não será uma duplicata de uma entrada válida.
-            // O backend irá capturar o formato inválido.
-            if (!horarioBackendFormat && horario && (day >= 3 && day <= 6 || day === 0)) { 
-                return false; // Não é uma duplicata de uma entrada válida, mas pode ser um formato inválido
-            }
-
-            const count = buffets.filter(b => b.data_buffet === data && b.horario_buffet === horarioBackendFormat).length;
+            // A validação de formato é feita no backend, aqui apenas verificamos a duplicidade da string
+            const count = buffets.filter(b => b.data_buffet === data && b.horario_buffet === horario).length;
             return count >= 1;
         }
 

@@ -37,19 +37,13 @@ function resolveImageUrl(url) {
     return 'http://localhost:3000/uploads/' + url;
 }
 
-// Função para formatar o horário do buffet
+// Função para formatar o horário do buffet para exibição no cardápio
+// Agora, como o backend salva a string exata (HH-HH ou HH:MM), podemos usá-la diretamente.
 function formatBuffetTime(timeString) {
     if (!timeString) return '';
-    switch (timeString) {
-        case '11:00:00':
-            return '11h às 14h';
-        case '16:00:00':
-            return '16h às 23h';
-        case '18:00:00':
-            return '18h às 23h';
-        default:
-            return timeString.substring(0, 5); // Retorna HH:MM se não for um dos padrões
-    }
+    // Retorna a string de horário como ela está salva no banco de dados.
+    // O backend já garante que o formato é HH-HH ou HH:MM.
+    return timeString;
 }
 
 async function fetchCardapio() {
