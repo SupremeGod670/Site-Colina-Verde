@@ -1,88 +1,101 @@
 
 # 🌿 Colina Verde - Site Oficial
 
-Este é o repositório do site oficial da **Colina Verde**, um espaço gastronômico que oferece buffet, porções, drinks e um ambiente aconchegante para todos os momentos. O site apresenta o cardápio, imagens do local, informações de contato e administração interna para gerenciamento do conteúdo.
+Este é o repositório do site oficial da **Colina Verde**, um espaço gastronômico que oferece buffet, porções, drinks e um ambiente aconchegante para todos os momentos. O site apresenta o cardápio, imagens do local, informações de contato e um sistema administrativo para gerenciamento interno.
 
 ---
 
 ## 📌 Funcionalidades
 
 - Página inicial com destaques do local e carrossel de imagens
-- Cardápio dividido em abas: Buffet, Porções e Drinks
-- Sistema administrativo com login seguro
-- Painel de gerenciamento para editar itens do cardápio
-- Integração com banco de dados PostgreSQL
+- Cardápio com abas separadas por categorias (Buffet, Porções, Drinks)
+- Sistema de autenticação e painel administrativo
+- Upload de imagens e cadastro de novos itens no cardápio
+- Backend com Node.js e Express
+- Integração com banco de dados via módulo `db.js`
 
 ---
 
 ## 🖥️ Tecnologias Utilizadas
 
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Backend**: Python (Flask ou FastAPI)
+- **Frontend**: HTML5, CSS3, JavaScript Vanilla
+- **Backend**: Node.js, Express
 - **Banco de Dados**: PostgreSQL
-- **Design**: Figma (protótipo baseado no Instagram oficial)
-- **Outros**: Bootstrap, Swiper.js (para carrossel), bcrypt (hash de senhas)
+- **Gerenciador de Pacotes**: npm
+- **Outros**: dotenv, multer (para uploads), estrutura modular
 
 ---
 
 ## 🛠️ Estrutura do Projeto
 
 ```
-/colina-verde/
-├── index.html              # Página inicial
-├── menu.html               # Cardápio com abas
-├── admin/
-│   ├── login.html
-│   ├── dashboard.html
-│   └── scripts.js
-├── static/
-│   ├── css/
-│   └── js/
+/SITE-COLINA-VERDE/
 ├── backend/
-│   ├── app.py              # API principal
-│   └── database.py
-├── sql/
-│   └── schema.sql          # Script de criação do banco PostgreSQL
+│   ├── uploads/            # Upload de arquivos (ex: imagens)
+│   ├── db.js               # Conexão com o banco de dados
+│   ├── routes.js           # Rotas da aplicação
+│   └── server.js           # Servidor Express
+├── frontend/
+│   ├── CSS/
+│   │   └── style.css
+│   ├── JS/
+│   │   └── script.js
+│   └── Layout/
+│       ├── index.html
+│       └── register.html
+├── CSS/
+│   ├── cardapio.css
+│   ├── index.css
+│   └── style.css
+├── JS/
+│   ├── cardapio.js
+│   └── index.js
+├── Layout/
+│   └── cardapio.html
+├── Img/                    # Imagens usadas no site
+├── .env                    # Variáveis de ambiente
+├── package.json
+├── package-lock.json
 └── README.md
 ```
 
 ---
 
-## 🚀 Como Rodar Localmente
+## 🚀 Como Rodar o Projeto Localmente
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/colina-verde.git
-   cd colina-verde
+   git clone https://github.com/Gabriel-GDS-dev/Site-Colina-Verde.git
+   cd SITE-COLINA-VERDE
    ```
 
-2. Instale as dependências (exemplo para Flask):
+2. Instale as dependências:
    ```bash
-   pip install -r requirements.txt
+   npm install
    ```
 
-3. Configure o banco de dados PostgreSQL e execute o script `schema.sql`.
+3. Configure o arquivo `.env` com as variáveis necessárias (ex: porta, string de conexão do banco etc.).
 
 4. Inicie o servidor:
    ```bash
-   python backend/app.py
+   node backend/server.js
    ```
 
-5. Acesse em `http://localhost:5000`
+5. Acesse no navegador:  
+   `http://localhost:PORT` (substitua `PORT` pela porta definida no `.env`)
 
 ---
 
 ## 🔒 Acesso Administrativo
 
-- Para acessar o painel administrativo:
-  - URL: `/admin/login.html`
-  - É necessário cadastro prévio no banco de dados.
+- Acesse via página de login (`/frontend/Layout/login.html`)
+- Cadastro e login protegidos (sugestão: criptografia, autenticação JWT)
 
 ---
 
 ## 📷 Referência Visual
 
-Baseado nas cores, fotos e estilo do Instagram oficial:  
+Design baseado no Instagram oficial:  
 [instagram.com/colinaverde_](https://www.instagram.com/colinaverde_/)
 
 ---
