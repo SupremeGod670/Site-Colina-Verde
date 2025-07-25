@@ -3,6 +3,15 @@ const cors = require('cors');
 const routes = require('./routes');
 const path = require('path');
 const app = express();
+const session = require('express-session');
+app.use(session({
+  secret: 'colina-verde-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: null
+  }
+}));
 app.use(cors());
 app.use(express.json());
 app.use('/api', routes);

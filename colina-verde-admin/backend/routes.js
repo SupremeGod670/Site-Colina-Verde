@@ -18,6 +18,63 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 const router = express.Router();
 
+// Middleware de autenticação
+function checkAuth(req, res, next) {
+    if (req.session.user) return next();
+    return res.status(401).json({ success: false, message: 'Não autorizado' });
+}
+
+// LOGIN
+router.post('/login', async (req, res) => {
+    const { username, senha } = req.body;
+    const user = await pool.query("SELECT * FROM administradores WHERE nome_usuario = $1", [username]);
+    if (user.rows.length > 0) {
+        const valid = await bcrypt.compare(senha, user.rows[0].senha_hash);
+        if (valid) {
+            req.session.user = { id: user.rows[0].id_admin, username: user.rows[0].nome_usuario };
+            return res.json({ success: true });
+        }
+    }
+    return res.status(401).json({ success: false });
+});
+
+// LOGOUT
+router.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.json({ success: true });
+    });
+});
+
+// PUT: Atualizar buffet pela data
+router.put('/buffet/data/:data_buffet', upload.array('media'), async (req, res) => {
+  const { preco_por_kg, descricao, horario_buffet } = req.body;
+  const data_buffet = req.params.data_buffet;
+
+  const result = await pool.query(
+    "UPDATE buffet SET preco_por_kg = $1, descricao = $2, horario_buffet = $3 WHERE data_buffet = $4",
+    [preco_por_kg, descricao, horario_buffet, data_buffet]
+  );
+
+  if (result.rowCount > 0) {
+    res.sendStatus(200);
+  } else {
+    res.status(404).json({ success: false, message: 'Buffet não encontrado para esta data.' });
+  }
+});
+
+// DELETE: Deletar buffet pela data
+router.delete('/buffet/data/:data_buffet', async (req, res) => {
+  const data_buffet = req.params.data_buffet;
+
+  const result = await pool.query("DELETE FROM buffet WHERE data_buffet = $1", [data_buffet]);
+
+  if (result.rowCount > 0) {
+    res.sendStatus(204);
+  } else {
+    res.status(404).json({ success: false, message: 'Buffet não encontrado para esta data.' });
+  }
+});
+
 // Atualiza porção pelo nome
 router.put('/porcoes/nome/:nome', upload.single('media'), async (req, res) => {
     const { descricao, preco_inteira, preco_meia } = req.body;
