@@ -120,6 +120,7 @@ async function fetchCardapio() {
                 <figure style="width:80px; margin:0 10px 0 0; display:inline-block; vertical-align:middle;">
                     <img src="${resolveImageUrl(item.url_imagem)}" alt="${item.nome_porcao}" style="width:100%;border-radius:8px;cursor:pointer;" onclick="expandImage('${resolveImageUrl(item.url_imagem)}','${item.nome_porcao}')" tabindex="0" aria-label="Expandir imagem de ${item.nome_porcao}">
                     <figcaption style="font-size:0.85rem;color:#388e3c;">${item.nome_porcao}</figcaption>
+                    <div style="font-size:0.75rem;color:#999;">${item.descricao}</div>
                 </figure>
                 <span style="font-weight:bold; color:#388e3c;">${preco}</span>
             </li>`;
@@ -136,6 +137,7 @@ async function fetchCardapio() {
                 <figure style="width:80px; margin:0 10px 0 0; display:inline-block; vertical-align:middle;">
                     <img src="${resolveImageUrl(item.url_imagem)}" alt="${item.nome_drink}" style="width:100%;border-radius:8px;cursor:pointer;" onclick="expandImage('${resolveImageUrl(item.url_imagem)}','${item.nome_drink}')" tabindex="0" aria-label="Expandir imagem de ${item.nome_drink}">
                     <figcaption style="font-size:0.85rem;color:#388e3c;">${item.nome_drink}</figcaption>
+                    <div style="font-size:0.75rem;color:#999;">${item.descricao}</div>
                 </figure>
                 <span style="font-weight:bold; color:#388e3c;">R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</span>
             </li>
